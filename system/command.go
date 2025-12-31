@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
+	"strings"
 	"sync"
 )
 
@@ -49,6 +50,35 @@ func RunFFplay(videopath string, timestamps chan string, playStates chan bool) e
 	close(playStates)
 	close(timestamps)
 	return cmd.Wait()
+}
+
+func GetVideoResolution(videopath string) (string, error) {
+	cmd := exec.Command(
+		"ffplay",
+		"-v",
+		"error",
+		"-select_streams",
+		"v:0",
+		"-show_entries",
+		"stream=width,height",
+		"-of",
+		"csv=s=x:p=0",
+		videopath,
+	)
+	output, err := RunSystemCommand(cmd)
+	if err != nil {
+		return "", fmt.Errorf("system.GetVideoResolution: ffprobe failed\nstderr: %v\nerr: %w", output, err)
+	}
+
+	output = strings.TrimSuffix(output, "\r\n")
+	output = strings.TrimSuffix(output, "\n")
+	output = strings.TrimSuffix(output, "\r")
+
+	if output == "" {
+		return "", errors.New("system.GetVideoResolution: ffprobe did not return resolution")
+	}
+
+	return output, nil
 }
 
 func RunSystemCommand(cmd *exec.Cmd) (string, error) {
