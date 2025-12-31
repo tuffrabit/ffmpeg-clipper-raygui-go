@@ -13,6 +13,42 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
+const (
+	VIDEO_LIST_START_X         = MAIN_WIDTH_PADDING
+	VIDEO_LIST_WIDTH   float32 = 500
+	VIDEO_LIST_END_X           = VIDEO_LIST_START_X + VIDEO_LIST_WIDTH
+	VIDEO_LIST_START_Y         = MAIN_HEIGHT_PADDING
+	VIDEO_LIST_HEIGHT  float32 = 500
+	VIDEO_LIST_END_Y           = VIDEO_LIST_START_Y + VIDEO_LIST_HEIGHT
+
+	VIDEO_LIST_BUTTON_WIDTH   = (VIDEO_LIST_WIDTH - MAIN_WIDTH_PADDING) / 2
+	VIDEO_LIST_BUTTON_START_Y = VIDEO_LIST_END_Y + MAIN_HEIGHT_PADDING
+	VIDEO_LIST_BUTTON_END_Y   = VIDEO_LIST_BUTTON_START_Y + BUTTON_HEIGHT
+
+	VIDEO_LIST_PLAY_BUTTON_START_X = VIDEO_LIST_START_X
+	VIDEO_LIST_PLAY_BUTTON_END_X   = VIDEO_LIST_START_X + VIDEO_LIST_BUTTON_WIDTH
+
+	VIDEO_LIST_DELETE_BUTTON_START_X = VIDEO_LIST_PLAY_BUTTON_END_X + MAIN_WIDTH_PADDING
+	VIDEO_LIST_DELETE_BUTTON_END_X   = VIDEO_LIST_DELETE_BUTTON_START_X + PROFILE_LIST_BUTTON_WIDTH
+
+	VIDEO_LIST_BUTTON_START_Y2 = VIDEO_LIST_BUTTON_END_Y + MAIN_HEIGHT_PADDING
+
+	VIDEO_LIST_CLIP_START_BUTTON_START_X = VIDEO_LIST_START_X
+	VIDEO_LIST_CLIP_START_BUTTON_END_X   = VIDEO_LIST_START_X + VIDEO_LIST_BUTTON_WIDTH
+
+	VIDEO_LIST_CLIP_STOP_BUTTON_START_X = VIDEO_LIST_CLIP_START_BUTTON_END_X + MAIN_WIDTH_PADDING
+
+	VIDEO_LIST_DELETE_CONFIRM_CONTEXT = "video_list_delete"
+)
+
+var (
+	videoListRect                rl.Rectangle = rl.Rectangle{X: VIDEO_LIST_START_X, Y: VIDEO_LIST_START_Y, Width: VIDEO_LIST_WIDTH, Height: VIDEO_LIST_HEIGHT}
+	videoListPlayButtonRect      rl.Rectangle = rl.Rectangle{X: VIDEO_LIST_PLAY_BUTTON_START_X, Y: VIDEO_LIST_BUTTON_START_Y, Width: VIDEO_LIST_BUTTON_WIDTH, Height: BUTTON_HEIGHT}
+	videoListDeleteButtonRect    rl.Rectangle = rl.Rectangle{X: VIDEO_LIST_DELETE_BUTTON_START_X, Y: VIDEO_LIST_BUTTON_START_Y, Width: VIDEO_LIST_BUTTON_WIDTH, Height: BUTTON_HEIGHT}
+	videoListClipStartButtonRect rl.Rectangle = rl.Rectangle{X: VIDEO_LIST_CLIP_START_BUTTON_START_X, Y: VIDEO_LIST_BUTTON_START_Y2, Width: VIDEO_LIST_BUTTON_WIDTH, Height: BUTTON_HEIGHT}
+	videoListClipStopButtonRect  rl.Rectangle = rl.Rectangle{X: VIDEO_LIST_CLIP_STOP_BUTTON_START_X, Y: VIDEO_LIST_BUTTON_START_Y2, Width: VIDEO_LIST_BUTTON_WIDTH, Height: BUTTON_HEIGHT}
+)
+
 var allowedExtensions []string = []string{
 	".mp4",
 	".mkv",
@@ -29,19 +65,7 @@ var playStates chan bool
 var playing bool
 var timestamp string
 
-func VideoList(appState *state.AppState) error {
-	if appState.LocalDirectory == "" {
-		return nil
-	}
-
-	appState.VideoListState.InitFileList(appState.LocalDirectory, allowedExtensions)
-
-	vlRect := rl.Rectangle{X: components.START_PADDING, Y: components.START_PADDING, Width: 500, Height: 500}
-	appState.VideoListState.Active = gui.ListView(vlRect, appState.VideoListState.ListEntries, &appState.VideoListState.ScrollIndex, appState.VideoListState.Active)
-
-	var padding float32 = 20
-	yStart := vlRect.Y + vlRect.Height + padding
-
+func populatePlayState() {
 	if timestamps != nil && playStates != nil {
 	timestamploop:
 		for {
@@ -66,24 +90,10 @@ func VideoList(appState *state.AppState) error {
 			}
 		}
 	}
+}
 
-	playButtonText := "Play"
-	if playing {
-		gui.SetState(gui.STATE_DISABLED)
-		playButtonText = timestamp
-	}
-	playButtonRect := rl.Rectangle{X: components.START_PADDING, Y: yStart, Width: 240, Height: components.BUTTON_HEIGHT}
-	playButton := gui.Button(playButtonRect, gui.IconText(gui.ICON_PLAYER_PLAY, playButtonText))
-
-	deleteButtonRectX := vlRect.X + vlRect.Width - 240
-	deleteButtonRect := rl.Rectangle{X: deleteButtonRectX, Y: yStart, Width: 240, Height: components.BUTTON_HEIGHT}
-	yStart = yStart + playButtonRect.Height + padding
-	deleteButton := gui.Button(deleteButtonRect, gui.IconText(gui.ICON_FILE_DELETE, "Delete"))
-	if playing {
-		gui.SetState(gui.STATE_NORMAL)
-	}
-
-	if playButton {
+func handlePlayClick(clicked bool, appState *state.AppState) {
+	if clicked {
 		file := appState.VideoListState.EntryList[appState.VideoListState.Active]
 		filepath := path.Join(appState.LocalDirectory, file.Name())
 
@@ -91,26 +101,61 @@ func VideoList(appState *state.AppState) error {
 		playStates = make(chan bool)
 		go system.RunFFplay(filepath, timestamps, playStates)
 	}
+}
 
-	if deleteButton {
+func handleVideoDeleteClick(clicked bool, appState *state.AppState) {
+	if clicked {
 		file := appState.VideoListState.EntryList[appState.VideoListState.Active]
 		filepath := path.Join(appState.LocalDirectory, file.Name())
-		appState.GlobalConfirmModalState.Init("Delete?", fmt.Sprintf("Are you sure you want to delete %s?", filepath))
+		appState.GlobalConfirmModalState.Init("Delete Video?", fmt.Sprintf("Are you sure you want to delete %s?", filepath), VIDEO_LIST_DELETE_CONFIRM_CONTEXT)
 	}
+}
 
-	if appState.GlobalConfirmModalState.Completed() {
+func handleVideoDeleteGlobalConfirm(appState *state.AppState) {
+	if appState.GlobalConfirmModalState.Completed(VIDEO_LIST_DELETE_CONFIRM_CONTEXT) {
 		if appState.GlobalConfirmModalState.Result {
 			file := appState.VideoListState.EntryList[appState.VideoListState.Active]
 			filepath := path.Join(appState.LocalDirectory, file.Name())
 			err := os.Remove(filepath)
 			if err != nil {
-				appState.GlobalMessageModalState.Init("Delete Error", fmt.Sprintf("Failed to delete %s, error: %v", filepath, err), components.MESSAGE_MODAL_TYPE_ERROR)
+				appState.GlobalMessageModalState.Init("Delete Video Error", fmt.Sprintf("Failed to delete %s, error: %v", filepath, err), components.MESSAGE_MODAL_TYPE_ERROR)
 			}
 			appState.VideoListState.Reset()
 		}
 
 		appState.GlobalConfirmModalState.Reset()
 	}
+}
+
+func VideoList(appState *state.AppState) error {
+	if appState.LocalDirectory == "" {
+		return nil
+	}
+
+	appState.VideoListState.InitFileList(appState.LocalDirectory, allowedExtensions)
+	appState.VideoListState.Active = gui.ListView(videoListRect, appState.VideoListState.ListEntries, &appState.VideoListState.ScrollIndex, appState.VideoListState.Active)
+
+	populatePlayState()
+
+	playButtonText := "Play"
+	if playing {
+		gui.SetState(gui.STATE_DISABLED)
+		playButtonText = timestamp
+	}
+	playButton := gui.Button(videoListPlayButtonRect, gui.IconText(gui.ICON_PLAYER_PLAY, playButtonText))
+	deleteButton := gui.Button(videoListDeleteButtonRect, gui.IconText(gui.ICON_FILE_DELETE, "Delete"))
+	gui.SetState(gui.STATE_NORMAL)
+
+	if !playing {
+		gui.SetState(gui.STATE_DISABLED)
+	}
+	gui.Button(videoListClipStartButtonRect, gui.IconText(gui.ICON_PLAYER_PREVIOUS, "Set Clip Start"))
+	gui.Button(videoListClipStopButtonRect, gui.IconText(gui.ICON_PLAYER_NEXT, "Set Clip Start"))
+	gui.SetState(gui.STATE_NORMAL)
+
+	handlePlayClick(playButton, appState)
+	handleVideoDeleteClick(deleteButton, appState)
+	handleVideoDeleteGlobalConfirm(appState)
 
 	return nil
 }

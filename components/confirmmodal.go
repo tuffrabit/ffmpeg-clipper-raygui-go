@@ -10,6 +10,7 @@ type ConfirmModalState struct {
 	Message    string
 	Confirmed  bool
 	Result     bool
+	Context    string
 }
 
 func (cps *ConfirmModalState) Reset() {
@@ -18,16 +19,22 @@ func (cps *ConfirmModalState) Reset() {
 	cps.Message = ""
 	cps.Confirmed = false
 	cps.Result = false
+	cps.Context = ""
 }
 
-func (cps *ConfirmModalState) Init(title string, message string) {
+func (cps *ConfirmModalState) Init(title string, message string, context string) {
 	cps.Reset()
 	cps.Title = title
 	cps.Message = message
+	cps.Context = context
 	cps.WindowOpen = true
 }
 
-func (cps *ConfirmModalState) Completed() bool {
+func (cps *ConfirmModalState) Completed(context string) bool {
+	if cps.Context != context {
+		return false
+	}
+
 	if !cps.WindowOpen && cps.Confirmed {
 		return true
 	}

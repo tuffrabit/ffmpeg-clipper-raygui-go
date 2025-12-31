@@ -9,7 +9,6 @@ import (
 
 const (
 	BUTTON_HEIGHT float32 = 50
-	START_PADDING float32 = 13
 )
 
 var xCenter optional.Optional[float32]

@@ -9,6 +9,8 @@ type AppState struct {
 	LocalDirectory            string
 	GlobalMessageModalState   components.MessageModalState
 	GlobalConfirmModalState   components.ConfirmModalState
+	GlobalInputModalState     components.InputModalState
 	LocalDirectoryPickerState components.FilePickerState
 	VideoListState            DirEntryListState
+	ProfileListState          ProfileListState
 }

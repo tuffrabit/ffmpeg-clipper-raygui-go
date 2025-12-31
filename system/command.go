@@ -14,7 +14,7 @@ import (
 func RunFFplay(videopath string, timestamps chan string, playStates chan bool) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	cmd := exec.CommandContext(ctx, "ffplay", "-x", "1280", "-loglevel", "-8", "-stats", videopath)
+	cmd := exec.CommandContext(ctx, "ffplay", "-y", "680", "-loglevel", "-8", "-stats", videopath)
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
 		return fmt.Errorf("could not get stderr pipe: %w", err)
