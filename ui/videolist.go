@@ -92,33 +92,43 @@ func populatePlayState() {
 	}
 }
 
+func handleVideoSelect(appState *state.AppState) {
+	file := appState.VideoListState.EntryList[appState.VideoListState.Active]
+
+	if appState.CurrentVideoState.Name != file.Name() {
+		appState.CurrentVideoState.Name = file.Name()
+		appState.CurrentVideoState.FullPath = path.Join(appState.LocalDirectory, file.Name())
+
+		width, height, err := system.GetVideoResolution(appState.CurrentVideoState.FullPath)
+		if err != nil {
+			appState.GlobalMessageModalState.Init("Video Resolution Error", fmt.Sprintf("Failed to calculate video resolution for %s, error: %v", appState.CurrentVideoState.FullPath, err), components.MESSAGE_MODAL_TYPE_ERROR)
+		}
+
+		appState.CurrentVideoState.Width = width
+		appState.CurrentVideoState.Height = height
+	}
+}
+
 func handlePlayClick(clicked bool, appState *state.AppState) {
 	if clicked {
-		file := appState.VideoListState.EntryList[appState.VideoListState.Active]
-		filepath := path.Join(appState.LocalDirectory, file.Name())
-
 		timestamps = make(chan string)
 		playStates = make(chan bool)
-		go system.RunFFplay(filepath, timestamps, playStates)
+		go system.RunFFplay(appState.CurrentVideoState.FullPath, timestamps, playStates)
 	}
 }
 
 func handleVideoDeleteClick(clicked bool, appState *state.AppState) {
 	if clicked {
-		file := appState.VideoListState.EntryList[appState.VideoListState.Active]
-		filepath := path.Join(appState.LocalDirectory, file.Name())
-		appState.GlobalConfirmModalState.Init("Delete Video?", fmt.Sprintf("Are you sure you want to delete %s?", filepath), VIDEO_LIST_DELETE_CONFIRM_CONTEXT)
+		appState.GlobalConfirmModalState.Init("Delete Video?", fmt.Sprintf("Are you sure you want to delete %s?", appState.CurrentVideoState.FullPath), VIDEO_LIST_DELETE_CONFIRM_CONTEXT)
 	}
 }
 
 func handleVideoDeleteGlobalConfirm(appState *state.AppState) {
 	if appState.GlobalConfirmModalState.Completed(VIDEO_LIST_DELETE_CONFIRM_CONTEXT) {
 		if appState.GlobalConfirmModalState.Result {
-			file := appState.VideoListState.EntryList[appState.VideoListState.Active]
-			filepath := path.Join(appState.LocalDirectory, file.Name())
-			err := os.Remove(filepath)
+			err := os.Remove(appState.CurrentVideoState.FullPath)
 			if err != nil {
-				appState.GlobalMessageModalState.Init("Delete Video Error", fmt.Sprintf("Failed to delete %s, error: %v", filepath, err), components.MESSAGE_MODAL_TYPE_ERROR)
+				appState.GlobalMessageModalState.Init("Delete Video Error", fmt.Sprintf("Failed to delete %s, error: %v", appState.CurrentVideoState.FullPath, err), components.MESSAGE_MODAL_TYPE_ERROR)
 			}
 			appState.VideoListState.Reset()
 		}
@@ -136,6 +146,7 @@ func VideoList(appState *state.AppState) error {
 	appState.VideoListState.Active = gui.ListView(videoListRect, appState.VideoListState.ListEntries, &appState.VideoListState.ScrollIndex, appState.VideoListState.Active)
 
 	populatePlayState()
+	handleVideoSelect(appState)
 
 	playButtonText := "Play"
 	if playing {
