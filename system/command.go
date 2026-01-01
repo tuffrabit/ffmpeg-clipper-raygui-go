@@ -28,12 +28,21 @@ func RunFFplay(videopath string, timestamps chan string, playStates chan bool) e
 	scanner.Split(bufio.ScanWords)
 	go func() {
 		prevScan := ""
+		capture := false
+
 		for scanner.Scan() {
 			currentScan := scanner.Text()
-			if currentScan == "A-V:" && prevScan != "nan" {
-				if err == nil {
-					timestamps <- prevScan
+
+			if prevScan == "vq=" {
+				if currentScan == "0KB" {
+					capture = false
+				} else {
+					capture = true
 				}
+			}
+
+			if capture && (currentScan == "A-V:" || currentScan == "M-V:" || currentScan == "M-A:") && prevScan != "nan" {
+				timestamps <- prevScan
 			}
 			prevScan = currentScan
 		}
