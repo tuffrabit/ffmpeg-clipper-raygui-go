@@ -11,6 +11,7 @@ type AppState struct {
 	GlobalConfirmModalState   components.ConfirmModalState
 	GlobalInputModalState     components.InputModalState
 	LocalDirectoryPickerState components.FilePickerState
+	CurrentVideoState         CurrentVideoState
 	VideoListState            DirEntryListState
 	ProfileListState          ProfileListState
 }

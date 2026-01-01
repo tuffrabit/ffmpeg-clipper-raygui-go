@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
+	"strconv"
 	"strings"
 	"sync"
 )
@@ -61,9 +62,9 @@ func RunFFplay(videopath string, timestamps chan string, playStates chan bool) e
 	return cmd.Wait()
 }
 
-func GetVideoResolution(videopath string) (string, error) {
+func GetVideoResolution(videopath string) (int, int, error) {
 	cmd := exec.Command(
-		"ffplay",
+		"ffprobe",
 		"-v",
 		"error",
 		"-select_streams",
@@ -76,7 +77,7 @@ func GetVideoResolution(videopath string) (string, error) {
 	)
 	output, err := RunSystemCommand(cmd)
 	if err != nil {
-		return "", fmt.Errorf("system.GetVideoResolution: ffprobe failed\nstderr: %v\nerr: %w", output, err)
+		return 0, 0, fmt.Errorf("system.GetVideoResolution: ffprobe failed\nstderr: %v\nerr: %w", output, err)
 	}
 
 	output = strings.TrimSuffix(output, "\r\n")
@@ -84,10 +85,25 @@ func GetVideoResolution(videopath string) (string, error) {
 	output = strings.TrimSuffix(output, "\r")
 
 	if output == "" {
-		return "", errors.New("system.GetVideoResolution: ffprobe did not return resolution")
+		return 0, 0, errors.New("system.GetVideoResolution: ffprobe did not return resolution")
 	}
 
-	return output, nil
+	parts := strings.Split(output, "x")
+	if len(parts) < 2 {
+		return 0, 0, fmt.Errorf("system.GetVideoResolution: resolution string %s failed to split correctly", output)
+	}
+
+	width, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return 0, 0, fmt.Errorf("system.GetVideoResolution: width part of resolution string %s failed to parse, error: %w", output, err)
+	}
+
+	height, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return 0, 0, fmt.Errorf("system.GetVideoResolution: height part of resolution string %s failed to parse, error: %w", output, err)
+	}
+
+	return width, height, nil
 }
 
 func RunSystemCommand(cmd *exec.Cmd) (string, error) {
