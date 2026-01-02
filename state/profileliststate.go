@@ -21,6 +21,22 @@ func (pls *ProfileListState) Reset() {
 	pls.ListEntries = ""
 }
 
+func (pls *ProfileListState) SelectedProfile() config.ClipProfileJson {
+	if len(pls.EntryList) > 0 {
+		return pls.EntryList[pls.Active]
+	}
+
+	return config.ClipProfileJson{}
+}
+
+func (pls *ProfileListState) UpdateSelectedProfile(profile config.ClipProfileJson) {
+	if len(pls.EntryList) == 0 {
+		return
+	}
+
+	pls.EntryList[pls.Active] = profile
+}
+
 func (pls *ProfileListState) InitProfileList() error {
 	if len(pls.EntryList) > 0 {
 		return nil
