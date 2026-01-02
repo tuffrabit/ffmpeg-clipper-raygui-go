@@ -47,6 +47,7 @@ func main() {
 		ui.VideoList(&appState)
 		ui.ProfileList(&appState)
 		ui.VideoSizeStats(&appState)
+		ui.StartStopInputs(&appState)
 		ui.Statusbar(&appState)
 
 		if appState.LocalDirectoryPickerState.WindowOpen {

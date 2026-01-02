@@ -7,4 +7,6 @@ const (
 	MAIN_HEIGHT_PADDING float32 = 13
 	BUTTON_HEIGHT               = components.BUTTON_HEIGHT
 	LABEL_HEIGHT                = components.LABEL_HEIGHT
+	LABEL_Y_PADDING     float32 = 2
+	TEXTBOX_HEIGHT              = components.TEXTBOX_HEIGHT
 )
