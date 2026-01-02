@@ -14,4 +14,5 @@ type AppState struct {
 	CurrentVideoState         CurrentVideoState
 	VideoListState            DirEntryListState
 	ProfileListState          ProfileListState
+	ClipState                 ClipState
 }

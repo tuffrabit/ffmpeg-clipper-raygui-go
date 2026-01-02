@@ -8,8 +8,9 @@ import (
 )
 
 const (
-	BUTTON_HEIGHT float32 = 50
-	LABEL_HEIGHT  float32 = 24
+	BUTTON_HEIGHT  float32 = 50
+	LABEL_HEIGHT   float32 = 24
+	TEXTBOX_HEIGHT float32 = 24
 )
 
 var xCenter optional.Optional[float32]
