@@ -53,7 +53,7 @@ func handleProfileUpdateClick(clicked bool, appState *state.AppState) {
 func handleProfileUpdateGlobalConfirm(appState *state.AppState) {
 	if appState.GlobalConfirmModalState.Completed(PROFILE_LIST_UPDATE_CONFIRM_CONTEXT) {
 		if appState.GlobalConfirmModalState.Result {
-			profile := appState.ProfileListState.EntryList[appState.ProfileListState.Active]
+			profile := appState.ProfileListState.SelectedProfile()
 			log.Println("Updated profile:", profile.ProfileName)
 			var err error
 			if err != nil {
@@ -89,7 +89,7 @@ func handleProfileCreateGlobalInput(appState *state.AppState) {
 
 func handleProfileDeleteClick(clicked bool, appState *state.AppState) {
 	if clicked {
-		profile := appState.ProfileListState.EntryList[appState.ProfileListState.Active]
+		profile := appState.ProfileListState.SelectedProfile()
 		appState.GlobalConfirmModalState.Init("Delete Profile?", fmt.Sprintf("Are you sure you want to delete %s?", profile.ProfileName), PROFILE_LIST_UPDATE_DELETE_CONTEXT)
 	}
 }
@@ -97,7 +97,7 @@ func handleProfileDeleteClick(clicked bool, appState *state.AppState) {
 func handleProfileDeleteGlobalConfirm(appState *state.AppState) {
 	if appState.GlobalConfirmModalState.Completed(PROFILE_LIST_UPDATE_DELETE_CONTEXT) {
 		if appState.GlobalConfirmModalState.Result {
-			profile := appState.ProfileListState.EntryList[appState.ProfileListState.Active]
+			profile := appState.ProfileListState.SelectedProfile()
 			log.Println("Deleted profile:", profile.ProfileName)
 			var err error
 			if err != nil {

@@ -9,4 +9,5 @@ const (
 	LABEL_HEIGHT                = components.LABEL_HEIGHT
 	LABEL_Y_PADDING     float32 = 2
 	TEXTBOX_HEIGHT              = components.TEXTBOX_HEIGHT
+	CHECKBOX_HEIGHT             = components.CHECKBOX_HEIGHT
 )
