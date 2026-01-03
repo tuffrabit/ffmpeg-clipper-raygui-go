@@ -2,7 +2,6 @@ package ui
 
 import (
 	"fmt"
-	"strings"
 
 	gui "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -24,32 +23,25 @@ const (
 	PROFILE_INPUTS_ENCODERS_LABEL_END_Y   = PROFILE_INPUTS_ENCODERS_LABEL_START_Y + LABEL_HEIGHT
 	PROFILE_INPUTS_ENCODERS_INPUT_START_Y = PROFILE_INPUTS_ENCODERS_LABEL_END_Y + LABEL_Y_PADDING
 	PROFILE_INPUTS_ENCODERS_INPUT_END_Y   = PROFILE_INPUTS_ENCODERS_INPUT_START_Y + DROPDOWNBOX_HEIGHT
+
+	PROFILE_INPUTS_ENCODER_PRESET_LABEL_START_Y = PROFILE_INPUTS_ENCODERS_INPUT_END_Y + MAIN_HEIGHT_PADDING
+	PROFILE_INPUTS_ENCODER_PRESET_LABEL_END_Y   = PROFILE_INPUTS_ENCODER_PRESET_LABEL_START_Y + LABEL_HEIGHT
+	PROFILE_INPUTS_ENCODER_PRESET_INPUT_START_Y = PROFILE_INPUTS_ENCODER_PRESET_LABEL_END_Y + LABEL_Y_PADDING
+	PROFILE_INPUTS_ENCODER_PRESET_INPUT_END_Y   = PROFILE_INPUTS_ENCODER_PRESET_INPUT_START_Y + DROPDOWNBOX_HEIGHT
 )
 
 var (
-	profileInputsScaleDownLabelRect rl.Rectangle = rl.Rectangle{X: PROFILE_INPUTS_START_X, Y: PROFILE_INPUTS_START_Y, Width: PROFILE_INPUTS_WIDTH, Height: LABEL_HEIGHT}
-	profileInputsScaleDownInputRect rl.Rectangle = rl.Rectangle{X: PROFILE_INPUTS_START_X, Y: PROFILE_INPUTS_SCALE_DOWN_INPUT_START_Y, Width: PROFILE_INPUTS_WIDTH, Height: LABEL_HEIGHT}
-	profileInputsEncodersLabelRect  rl.Rectangle = rl.Rectangle{X: PROFILE_INPUTS_START_X, Y: PROFILE_INPUTS_ENCODERS_LABEL_START_Y, Width: PROFILE_INPUTS_WIDTH, Height: LABEL_HEIGHT}
-	profileInputsEncodersInputRect  rl.Rectangle = rl.Rectangle{X: PROFILE_INPUTS_START_X, Y: PROFILE_INPUTS_ENCODERS_INPUT_START_Y, Width: PROFILE_INPUTS_WIDTH, Height: LABEL_HEIGHT}
+	profileInputsScaleDownLabelRect     rl.Rectangle = rl.Rectangle{X: PROFILE_INPUTS_START_X, Y: PROFILE_INPUTS_START_Y, Width: PROFILE_INPUTS_WIDTH, Height: LABEL_HEIGHT}
+	profileInputsScaleDownInputRect     rl.Rectangle = rl.Rectangle{X: PROFILE_INPUTS_START_X, Y: PROFILE_INPUTS_SCALE_DOWN_INPUT_START_Y, Width: PROFILE_INPUTS_WIDTH, Height: TEXTBOX_HEIGHT}
+	profileInputsEncodersLabelRect      rl.Rectangle = rl.Rectangle{X: PROFILE_INPUTS_START_X, Y: PROFILE_INPUTS_ENCODERS_LABEL_START_Y, Width: PROFILE_INPUTS_WIDTH, Height: LABEL_HEIGHT}
+	profileInputsEncodersInputRect      rl.Rectangle = rl.Rectangle{X: PROFILE_INPUTS_START_X, Y: PROFILE_INPUTS_ENCODERS_INPUT_START_Y, Width: PROFILE_INPUTS_WIDTH, Height: DROPDOWNBOX_HEIGHT}
+	profileInputsEncoderPresetLabelRect rl.Rectangle = rl.Rectangle{X: PROFILE_INPUTS_START_X, Y: PROFILE_INPUTS_ENCODER_PRESET_LABEL_START_Y, Width: PROFILE_INPUTS_WIDTH, Height: LABEL_HEIGHT}
+	profileInputsEncoderPresetInputRect rl.Rectangle = rl.Rectangle{X: PROFILE_INPUTS_START_X, Y: PROFILE_INPUTS_ENCODER_PRESET_INPUT_START_Y, Width: PROFILE_INPUTS_WIDTH, Height: DROPDOWNBOX_HEIGHT}
 
-	scaleFactorEditMode bool   = false
-	encoderList         string = EncoderList()
-	encoderListActive   int32  = 0
-	encoderListEditMode bool   = false
+	scaleFactorEditMode      bool                                    = false
+	encoderListEditMode      bool                                    = false
+	encoderListDropDownState state.DropDownState[config.EncoderType] = state.CreateDropDownState(config.GetEncoderTypesByTitle())
 )
-
-func EncoderList() string {
-	encoderTypes := config.GetEncoderTypes()
-	encoderList := ""
-
-	for _, encoderName := range encoderTypes {
-		encoderList = fmt.Sprintf("%s%s;", encoderList, encoderName)
-	}
-
-	encoderList = strings.TrimSuffix(encoderList, ";")
-
-	return encoderList
-}
 
 func ProfileInputs(appState *state.AppState) error {
 	if appState.LocalDirectory == "" {
@@ -64,7 +56,7 @@ func ProfileInputs(appState *state.AppState) error {
 	}
 
 	gui.Label(profileInputsEncodersLabelRect, "Encoder")
-	if gui.DropdownBox(profileInputsEncodersInputRect, encoderList, &encoderListActive, encoderListEditMode) {
+	if gui.DropdownBox(profileInputsEncodersInputRect, encoderListDropDownState.ListEntries, &encoderListDropDownState.Active, encoderListEditMode) {
 		encoderListEditMode = !encoderListEditMode
 	}
 
