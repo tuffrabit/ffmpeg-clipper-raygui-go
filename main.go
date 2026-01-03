@@ -23,7 +23,7 @@ func main() {
 
 	configLoadErr := config.LoadConfig()
 
-	rl.InitWindow(1280, 720, "ffmpeg clipper raygui")
+	rl.InitWindow(ui.WINDOW_WIDTH, ui.WINDOW_HEIGHT, "ffmpeg clipper raygui")
 	defer rl.CloseWindow()
 
 	appState := state.AppState{}
@@ -49,6 +49,7 @@ func main() {
 		ui.VideoSizeStats(&appState)
 		ui.StartStopInputs(&appState)
 		ui.ClipButtonRow(&appState)
+		ui.ProfileInputs(&appState)
 		ui.Statusbar(&appState)
 
 		if appState.LocalDirectoryPickerState.WindowOpen {
