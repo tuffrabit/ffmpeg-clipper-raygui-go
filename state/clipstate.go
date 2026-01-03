@@ -9,7 +9,5 @@ type ClipState struct {
 
 func (cs *ClipState) Reset() {
 	cs.Start = ""
-	cs.StartEditMode = false
 	cs.End = ""
-	cs.EndEditMode = false
 }
