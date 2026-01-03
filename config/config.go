@@ -43,50 +43,50 @@ type ClipProfileJsonEncoderSettings struct {
 	IntelAv1  IntelAv1EncoderSettings  `json:"av1_qsv"`
 }
 
-func (s *ClipProfileJsonEncoderSettings) SetEncoderSettings(t EncoderType, i EncoderSettingsInterface) {
+func (s *ClipProfileJsonEncoderSettings) SetEncoderSettings(t string, i EncoderSettingsInterface) {
 	switch t {
-	case Libx264EncoderType:
+	case Libx264EncoderName:
 		val, ok := i.(*Libx264EncoderSettings)
 		if ok {
 			s.Libx264.EncodingPreset = val.EncodingPreset
 			s.Libx264.QualityTarget = val.QualityTarget
 		}
-	case Libx265EncoderType:
+	case Libx265EncoderName:
 		val, ok := i.(*Libx265EncoderSettings)
 		if ok {
 			s.Libx265.EncodingPreset = val.EncodingPreset
 			s.Libx265.QualityTarget = val.QualityTarget
 		}
-	case LibaomAv1EncoderType:
+	case LibaomAv1EncoderName:
 		val, ok := i.(*LibaomAv1EncoderSettings)
 		if ok {
 			s.LibaomAv1.QualityTarget = val.QualityTarget
 		}
-	case NvencH264EncoderType:
+	case NvencH264EncoderName:
 		val, ok := i.(*NvencH264EncoderSettings)
 		if ok {
 			s.NvencH264.EncodingPreset = val.EncodingPreset
 			s.NvencH264.QualityTarget = val.QualityTarget
 		}
-	case NvencHevcEncoderType:
+	case NvencHevcEncoderName:
 		val, ok := i.(*NvencHevcEncoderSettings)
 		if ok {
 			s.NvencHevc.EncodingPreset = val.EncodingPreset
 			s.NvencHevc.QualityTarget = val.QualityTarget
 		}
-	case IntelH264EncoderType:
+	case IntelH264EncoderName:
 		val, ok := i.(*IntelH264EncoderSettings)
 		if ok {
 			s.IntelH264.EncodingPreset = val.EncodingPreset
 			s.IntelH264.QualityTarget = val.QualityTarget
 		}
-	case IntelHevcEncoderType:
+	case IntelHevcEncoderName:
 		val, ok := i.(*IntelHevcEncoderSettings)
 		if ok {
 			s.IntelHevc.EncodingPreset = val.EncodingPreset
 			s.IntelHevc.QualityTarget = val.QualityTarget
 		}
-	case IntelAv1EncoderType:
+	case IntelAv1EncoderName:
 		val, ok := i.(*IntelAv1EncoderSettings)
 		if ok {
 			s.IntelAv1.EncodingPreset = val.EncodingPreset
@@ -268,18 +268,111 @@ func (s IntelAv1EncoderSettings) GetQualityTarget() int {
 	return s.QualityTarget
 }
 
-type EncoderType string
+type EncoderType struct {
+	Name  string `json:"name"`
+	Title string `json:"type"`
+}
+
+func (et EncoderType) String() string {
+	return et.Title
+}
 
 const (
-	Libx264EncoderType   EncoderType = "libx264"
-	Libx265EncoderType   EncoderType = "libx265"
-	LibaomAv1EncoderType EncoderType = "libaom-av1"
-	NvencH264EncoderType EncoderType = "h264_nvenc"
-	NvencHevcEncoderType EncoderType = "hevc_nvenc"
-	IntelH264EncoderType EncoderType = "h264_qsv"
-	IntelHevcEncoderType EncoderType = "hevc_qsv"
-	IntelAv1EncoderType  EncoderType = "av1_qsv"
+	Libx264EncoderName   string = "libx264"
+	Libx265EncoderName   string = "libx265"
+	LibaomAv1EncoderName string = "libaom-av1"
+	NvencH264EncoderName string = "h264_nvenc"
+	NvencHevcEncoderName string = "hevc_nvenc"
+	IntelH264EncoderName string = "h264_qsv"
+	IntelHevcEncoderName string = "hevc_qsv"
+	IntelAv1EncoderName  string = "av1_qsv"
 )
+
+var (
+	Libx264EncoderType   EncoderType = EncoderType{Name: Libx264EncoderName, Title: "CPU H.264"}
+	Libx265EncoderType   EncoderType = EncoderType{Name: Libx265EncoderName, Title: "CPU H.265"}
+	LibaomAv1EncoderType EncoderType = EncoderType{Name: LibaomAv1EncoderName, Title: "CPU AV1"}
+	NvencH264EncoderType EncoderType = EncoderType{Name: NvencH264EncoderName, Title: "Nvidia H.264"}
+	NvencHevcEncoderType EncoderType = EncoderType{Name: NvencHevcEncoderName, Title: "Nvidia H.265"}
+	IntelH264EncoderType EncoderType = EncoderType{Name: IntelH264EncoderName, Title: "Intel H.264"}
+	IntelHevcEncoderType EncoderType = EncoderType{Name: IntelHevcEncoderName, Title: "Intel H.265"}
+	IntelAv1EncoderType  EncoderType = EncoderType{Name: IntelAv1EncoderName, Title: "Intel AV1"}
+
+	libx264Presets = map[string]string{
+		"ultrafast": "ultrafast",
+		"superfast": "superfast",
+		"veryfast":  "veryfast",
+		"faster":    "faster",
+		"fast":      "fast",
+		"medium":    "medium",
+		"slow":      "slow",
+		"slower":    "slower",
+		"veryslow":  "veryslow",
+	}
+	libx265Presets = map[string]string{
+		"ultrafast": "ultrafast",
+		"superfast": "superfast",
+		"veryfast":  "veryfast",
+		"faster":    "faster",
+		"fast":      "fast",
+		"medium":    "medium",
+		"slow":      "slow",
+		"slower":    "slower",
+		"veryslow":  "veryslow",
+	}
+	nvenc264Presets = map[string]string{
+		"fastest": "p1",
+		"faster":  "p2",
+		"fast":    "p3",
+		"medium":  "p4",
+		"slow":    "p5",
+		"slower":  "p6",
+		"slowest": "p7",
+	}
+	nvencHevcPresets = map[string]string{
+		"fastest": "p1",
+		"faster":  "p2",
+		"fast":    "p3",
+		"medium":  "p4",
+		"slow":    "p5",
+		"slower":  "p6",
+		"slowest": "p7",
+	}
+	intelh264Presets = map[string]string{
+		"veryfast": "veryfast",
+		"faster":   "faster",
+		"fast":     "fast",
+		"medium":   "medium",
+		"slow":     "slow",
+		"slower":   "slower",
+		"veryslow": "veryslow",
+	}
+	intelHevcPresets = map[string]string{
+		"veryfast": "veryfast",
+		"faster":   "faster",
+		"fast":     "fast",
+		"medium":   "medium",
+		"slow":     "slow",
+		"slower":   "slower",
+		"veryslow": "veryslow",
+	}
+	intelAv1Presets = map[string]string{
+		"veryfast": "veryfast",
+		"faster":   "faster",
+		"fast":     "fast",
+		"medium":   "medium",
+		"slow":     "slow",
+		"slower":   "slower",
+		"veryslow": "veryslow",
+	}
+)
+
+func GetEncoderPresets(name string) map[string]string {
+	switch name {
+	case Libx264EncoderName:
+
+	}
+}
 
 func NewProfile(name string) *ClipProfileJson {
 	libx264EncoderSettings := Libx264EncoderSettings{
@@ -347,17 +440,32 @@ func NewProfile(name string) *ClipProfileJson {
 	}
 }
 
-func GetEncoderTypes() map[EncoderType]string {
-	m := make(map[EncoderType]string)
+func GetEncoderTypes() map[string]EncoderType {
+	m := make(map[string]EncoderType)
 
-	m[Libx264EncoderType] = "CPU H.264"
-	m[Libx265EncoderType] = "CPU H.265"
-	m[LibaomAv1EncoderType] = "CPU AV1"
-	m[NvencH264EncoderType] = "Nvidia H.264"
-	m[NvencHevcEncoderType] = "Nvidia H.265"
-	m[IntelH264EncoderType] = "Intel H.264"
-	m[IntelHevcEncoderType] = "Intel H.265"
-	m[IntelAv1EncoderType] = "Intel AV1"
+	m[Libx264EncoderName] = Libx264EncoderType
+	m[Libx265EncoderName] = Libx265EncoderType
+	m[LibaomAv1EncoderName] = LibaomAv1EncoderType
+	m[NvencH264EncoderName] = NvencH264EncoderType
+	m[NvencHevcEncoderName] = NvencHevcEncoderType
+	m[IntelH264EncoderName] = IntelH264EncoderType
+	m[IntelHevcEncoderName] = IntelHevcEncoderType
+	m[IntelAv1EncoderName] = IntelAv1EncoderType
+
+	return m
+}
+
+func GetEncoderTypesByTitle() map[string]EncoderType {
+	m := make(map[string]EncoderType)
+
+	m[Libx264EncoderType.Title] = Libx264EncoderType
+	m[Libx265EncoderType.Title] = Libx265EncoderType
+	m[LibaomAv1EncoderType.Title] = LibaomAv1EncoderType
+	m[NvencH264EncoderType.Title] = NvencH264EncoderType
+	m[NvencHevcEncoderType.Title] = NvencHevcEncoderType
+	m[IntelH264EncoderType.Title] = IntelH264EncoderType
+	m[IntelHevcEncoderType.Title] = IntelHevcEncoderType
+	m[IntelAv1EncoderType.Title] = IntelAv1EncoderType
 
 	return m
 }
