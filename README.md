@@ -1,5 +1,9 @@
 # ffmpeg-clipper-raygui-go
 
+## Disclaimer
+
+No AI was used in the making of this. I like to learn things for myself.
+
 ## Description
 Cross platform desktop GUI tool for making video clips. Download an executable from the releases and run it. It will ask you to open a directory (pick a target folder) full of video files. This tool takes all the complicated parts of using FFmpeg to edit simple video clips and hides it behind a (hopefully) easy to use interface. You should have FFmpeg, FFprobe, and FFplay either in the target directory or installed globally on your system.
 
