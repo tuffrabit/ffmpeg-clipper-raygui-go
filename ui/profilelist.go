@@ -41,7 +41,22 @@ var (
 	profileListUpdateButtonRect rl.Rectangle = rl.Rectangle{X: PROFILE_LIST_UPDATE_BUTTON_START_X, Y: PROFILE_LIST_BUTTON_START_Y, Width: PROFILE_LIST_BUTTON_WIDTH, Height: BUTTON_HEIGHT}
 	profileListCreateButtonRect rl.Rectangle = rl.Rectangle{X: PROFILE_LIST_CREATE_BUTTON_START_X, Y: PROFILE_LIST_BUTTON_START_Y, Width: PROFILE_LIST_BUTTON_WIDTH, Height: BUTTON_HEIGHT}
 	profileListDeleteButtonRect rl.Rectangle = rl.Rectangle{X: PROFILE_LIST_DELETE_BUTTON_START_X, Y: PROFILE_LIST_BUTTON_START_Y, Width: PROFILE_LIST_BUTTON_WIDTH, Height: BUTTON_HEIGHT}
+
+	previousProfileListStateActive int32 = -1
 )
+
+func handleProfileChange(appState *state.AppState) {
+	if appState.ProfileListState.Active != previousProfileListStateActive {
+		encoderPresetsState, err := state.InitPresetStatesFromConfig(appState.ProfileListState.SelectedProfile().ProfileName)
+		if err != nil {
+			appState.GlobalMessageModalState.Init("Profile Select Error", fmt.Sprintf("Failed to load config, error: %v", err), components.MESSAGE_MODAL_TYPE_ERROR)
+		}
+
+		appState.EncoderPresetsState = encoderPresetsState
+	}
+
+	previousProfileListStateActive = appState.ProfileListState.Active
+}
 
 func handleProfileUpdateClick(clicked bool, appState *state.AppState) {
 	if clicked {
@@ -121,6 +136,7 @@ func ProfileList(appState *state.AppState) error {
 	createButton := gui.Button(profileListCreateButtonRect, gui.IconText(gui.ICON_FILE_ADD, "Create"))
 	deleteButton := gui.Button(profileListDeleteButtonRect, gui.IconText(gui.ICON_FILE_DELETE, "Delete"))
 
+	handleProfileChange(appState)
 	handleProfileUpdateClick(updateButton, appState)
 	handleProfileUpdateGlobalConfirm(appState)
 	handleProfileCreateClick(createButton, appState)

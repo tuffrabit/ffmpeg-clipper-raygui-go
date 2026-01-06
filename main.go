@@ -26,7 +26,7 @@ func main() {
 	rl.InitWindow(ui.WINDOW_WIDTH, ui.WINDOW_HEIGHT, "ffmpeg clipper raygui")
 	defer rl.CloseWindow()
 
-	appState := state.AppState{}
+	appState := state.CreateAppState()
 	if configLoadErr != nil {
 		appState.StatusText = fmt.Sprintf("failed to load config, error: %v", configLoadErr)
 		log.Println(appState.StatusText)
