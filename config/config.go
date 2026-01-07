@@ -349,12 +349,12 @@ var (
 		Titles: []string{},
 	}
 	nvenc264Presets = EncoderPresetSeparated{
-		Names:  []string{"fastest", "faster", "fast", "medium", "slow", "slower", "slowest"},
-		Titles: []string{"p1", "p2", "p3", "p4", "p5", "p6", "p7"},
+		Names:  []string{"p1", "p2", "p3", "p4", "p5", "p6", "p7"},
+		Titles: []string{"fastest", "faster", "fast", "medium", "slow", "slower", "slowest"},
 	}
 	nvencHevcPresets = EncoderPresetSeparated{
-		Names:  []string{"fastest", "faster", "fast", "medium", "slow", "slower", "slowest"},
-		Titles: []string{"p1", "p2", "p3", "p4", "p5", "p6", "p7"},
+		Names:  []string{"p1", "p2", "p3", "p4", "p5", "p6", "p7"},
+		Titles: []string{"fastest", "faster", "fast", "medium", "slow", "slower", "slowest"},
 	}
 	intelh264Presets = EncoderPresetSeparated{
 		Names:  []string{"veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"},
