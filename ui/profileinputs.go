@@ -138,11 +138,6 @@ func ProfileInputs(appState *state.AppState) error {
 		}
 	}
 
-	gui.Label(profileInputsEncodersLabelRect, "Encoder")
-	if gui.DropdownBox(profileInputsEncodersInputRect, encoderListDropDownState.ListEntries, &encoderListDropDownState.Active, encoderListEditMode) {
-		encoderListEditMode = !encoderListEditMode
-	}
-
 	encoderType := encoderListDropDownState.Selected().Name
 	if encoderListPreviousActiveName != encoderType {
 		encoderPresetState, err = appState.GetEncoderPresetState(encoderType)
@@ -159,13 +154,6 @@ func ProfileInputs(appState *state.AppState) error {
 		}
 	}
 	encoderListPreviousActiveName = encoderType
-
-	if encoderSettingsValid {
-		gui.Label(profileInputsEncoderPresetLabelRect, "Encoding Preset")
-		if gui.DropdownBox(profileInputsEncoderPresetInputRect, encoderSettingsDropDownState.ListEntries, &encoderSettingsDropDownState.Active, encoderPresetListEditMode) {
-			encoderPresetListEditMode = !encoderPresetListEditMode
-		}
-	}
 
 	qualityTarget := fmt.Sprintf("%d", encoderPresetState.QualityTarget)
 	gui.Label(profileInputsQualityTargetLabelRect, "Quality Target (0 to 51)")
@@ -209,7 +197,18 @@ func ProfileInputs(appState *state.AppState) error {
 		blackLevelEditMode = !blackLevelEditMode
 	}
 
-	// TODO: fix dropdown z-order
+	if encoderSettingsValid {
+		gui.Label(profileInputsEncoderPresetLabelRect, "Encoding Preset")
+		if gui.DropdownBox(profileInputsEncoderPresetInputRect, encoderSettingsDropDownState.ListEntries, &encoderSettingsDropDownState.Active, encoderPresetListEditMode) {
+			encoderPresetListEditMode = !encoderPresetListEditMode
+		}
+	}
+
+	gui.Label(profileInputsEncodersLabelRect, "Encoder")
+	if gui.DropdownBox(profileInputsEncodersInputRect, encoderListDropDownState.ListEntries, &encoderListDropDownState.Active, encoderListEditMode) {
+		encoderListEditMode = !encoderListEditMode
+	}
+
 	// TODO: fix nvidia encoder settings titles
 	// TODO: track and update all input values. probably from a state struct with lazy comparison
 	appState.ProfileListState.UpdateSelectedProfile(profile)
