@@ -12,6 +12,7 @@ type DirEntryListState struct {
 	ScrollIndex int32
 	Active      int32
 	EntryList   []os.DirEntry
+	InitAttempt bool
 	ListEntries string
 }
 
@@ -19,10 +20,15 @@ func (dels *DirEntryListState) Reset() {
 	dels.ScrollIndex = 0
 	dels.Active = 0
 	dels.EntryList = nil
+	dels.InitAttempt = false
 	dels.ListEntries = ""
 }
 
 func (dels *DirEntryListState) InitFileList(directory string, includeExtensions []string) error {
+	if dels.InitAttempt {
+		return nil
+	}
+
 	if len(dels.EntryList) > 0 {
 		return nil
 	}
@@ -54,6 +60,7 @@ func (dels *DirEntryListState) InitFileList(directory string, includeExtensions 
 	}
 
 	dels.ListEntries = strings.TrimSuffix(dels.ListEntries, ";")
+	dels.InitAttempt = true
 
 	return nil
 }

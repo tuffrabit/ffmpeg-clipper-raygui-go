@@ -93,6 +93,10 @@ func populatePlayState() {
 }
 
 func handleVideoSelect(appState *state.AppState) {
+	if len(appState.VideoListState.EntryList) == 0 {
+		return
+	}
+
 	file := appState.VideoListState.EntryList[appState.VideoListState.Active]
 
 	if appState.CurrentVideoState.Name != file.Name() {
