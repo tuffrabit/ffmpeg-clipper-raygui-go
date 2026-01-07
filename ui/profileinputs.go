@@ -97,13 +97,14 @@ var (
 	encoderSettingsDropDownState   state.DropDownState[string]
 	encoderPresetListEditMode      bool = false
 	encoderSettingsValid           bool
-	qualityTargetEditMode          bool = false
-	saturationEditMode             bool = false
-	contrastEditMode               bool = false
-	brightnessEditMode             bool = false
-	gammaEditMode                  bool = false
-	exposureEditMode               bool = false
-	blackLevelEditMode             bool = false
+	encoderPresetListActiveFake    int32 = 0
+	qualityTargetEditMode          bool  = false
+	saturationEditMode             bool  = false
+	contrastEditMode               bool  = false
+	brightnessEditMode             bool  = false
+	gammaEditMode                  bool  = false
+	exposureEditMode               bool  = false
+	blackLevelEditMode             bool  = false
 )
 
 func encoderSettingIndex(value string, values []string) int32 {
@@ -197,11 +198,15 @@ func ProfileInputs(appState *state.AppState) error {
 		blackLevelEditMode = !blackLevelEditMode
 	}
 
+	gui.Label(profileInputsEncoderPresetLabelRect, "Encoding Preset")
 	if encoderSettingsValid {
-		gui.Label(profileInputsEncoderPresetLabelRect, "Encoding Preset")
 		if gui.DropdownBox(profileInputsEncoderPresetInputRect, encoderSettingsDropDownState.ListEntries, &encoderSettingsDropDownState.Active, encoderPresetListEditMode) {
 			encoderPresetListEditMode = !encoderPresetListEditMode
 		}
+	} else {
+		gui.SetState(gui.STATE_DISABLED)
+		gui.DropdownBox(profileInputsEncoderPresetInputRect, ";", &encoderPresetListActiveFake, false)
+		gui.SetState(gui.STATE_NORMAL)
 	}
 
 	gui.Label(profileInputsEncodersLabelRect, "Encoder")
@@ -209,7 +214,6 @@ func ProfileInputs(appState *state.AppState) error {
 		encoderListEditMode = !encoderListEditMode
 	}
 
-	// TODO: fix nvidia encoder settings titles
 	// TODO: track and update all input values. probably from a state struct with lazy comparison
 	appState.ProfileListState.UpdateSelectedProfile(profile)
 
