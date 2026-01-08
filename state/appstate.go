@@ -16,6 +16,7 @@ type AppState struct {
 	CurrentVideoState         CurrentVideoState
 	VideoListState            DirEntryListState
 	ProfileListState          ProfileListState
+	ProfileState              ProfileState
 	ClipState                 ClipState
 	EncoderPresetsState       map[string]EncoderPresetState
 }
