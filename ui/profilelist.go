@@ -2,7 +2,6 @@ package ui
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/components"
 	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/config"
@@ -76,7 +75,6 @@ func handleProfileUpdateGlobalConfirm(appState *state.AppState) {
 			if err != nil {
 				appState.GlobalMessageModalState.Init("Update Profile Error", fmt.Sprintf("Failed to update %s, error: %v", profile.ProfileName, err), components.MESSAGE_MODAL_TYPE_ERROR)
 			}
-			log.Println("Updated profile:", profile.ProfileName)
 			appState.ProfileListState.Reset()
 		}
 
@@ -93,8 +91,9 @@ func handleProfileCreateClick(clicked bool, appState *state.AppState) {
 func handleProfileCreateGlobalInput(appState *state.AppState) {
 	if appState.GlobalInputModalState.Completed(PROFILE_LIST_CREATE_INPUT_CONTEXT) {
 		if appState.GlobalInputModalState.Result != "" {
-			log.Println("Created profile:", appState.GlobalInputModalState.Result)
-			var err error
+			profile := appState.ProfileListState.SelectedProfile()
+			profile.ProfileName = appState.GlobalInputModalState.Result
+			err := config.SaveProfile(&profile)
 			if err != nil {
 				appState.GlobalMessageModalState.Init("Create Profile Error", fmt.Sprintf("Failed to create %s, error: %v", appState.GlobalInputModalState.Result, err), components.MESSAGE_MODAL_TYPE_ERROR)
 			}
@@ -116,8 +115,7 @@ func handleProfileDeleteGlobalConfirm(appState *state.AppState) {
 	if appState.GlobalConfirmModalState.Completed(PROFILE_LIST_UPDATE_DELETE_CONTEXT) {
 		if appState.GlobalConfirmModalState.Result {
 			profile := appState.ProfileListState.SelectedProfile()
-			log.Println("Deleted profile:", profile.ProfileName)
-			var err error
+			err := config.DeleteProfile(profile.ProfileName)
 			if err != nil {
 				appState.GlobalMessageModalState.Init("Delete Profile Error", fmt.Sprintf("Failed to delete %s, error: %v", profile.ProfileName, err), components.MESSAGE_MODAL_TYPE_ERROR)
 			}

@@ -68,14 +68,14 @@ type ProfileState struct {
 
 func (ps *ProfileState) Init(profile config.ClipProfileJson) {
 	ps.Profile = profile
-	ps.ScaleFactorInput = fmt.Sprintf("%f", profile.ScaleFactor)
+	ps.ScaleFactorInput = strconv.FormatFloat(float64(profile.ScaleFactor), 'f', -1, 32)
 	ps.EncoderActive = int32(config.GetEncoderTypeIndex(profile.Encoder.Name))
-	ps.SaturationInput = fmt.Sprintf("%f", profile.Saturation)
-	ps.ContrastInput = fmt.Sprintf("%f", profile.Contrast)
-	ps.BrightnessInput = fmt.Sprintf("%f", profile.Brightness)
-	ps.GammaInput = fmt.Sprintf("%f", profile.Gamma)
-	ps.ExposureInput = fmt.Sprintf("%f", profile.Exposure)
-	ps.BlackLevelInput = fmt.Sprintf("%f", profile.BlackLevel)
+	ps.SaturationInput = strconv.FormatFloat(float64(profile.Saturation), 'f', -1, 32)
+	ps.ContrastInput = strconv.FormatFloat(float64(profile.Contrast), 'f', -1, 32)
+	ps.BrightnessInput = strconv.FormatFloat(float64(profile.Brightness), 'f', -1, 32)
+	ps.GammaInput = strconv.FormatFloat(float64(profile.Gamma), 'f', -1, 32)
+	ps.ExposureInput = strconv.FormatFloat(float64(profile.Exposure), 'f', -1, 32)
+	ps.BlackLevelInput = strconv.FormatFloat(float64(profile.BlackLevel), 'f', -1, 32)
 	ps.Libx264EncodingPresetActive = int32(config.GetEncoderPresetIndex(config.Libx264EncoderName, profile.EncoderSettings.Libx264.EncodingPreset))
 	ps.Libx264EncodingQualityTargetInput = fmt.Sprintf("%d", profile.EncoderSettings.Libx264.QualityTarget)
 	ps.Libx265EncodingPresetActive = int32(config.GetEncoderPresetIndex(config.Libx265EncoderName, profile.EncoderSettings.Libx265.EncodingPreset))
