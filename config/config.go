@@ -336,11 +336,11 @@ var (
 	IntelHevcEncoderType EncoderType = EncoderType{Name: IntelHevcEncoderName, Title: "Intel H.265"}
 	IntelAv1EncoderType  EncoderType = EncoderType{Name: IntelAv1EncoderName, Title: "Intel AV1"}
 
-	libx264Presets = EncoderPresetSeparated{
+	Libx264Presets = EncoderPresetSeparated{
 		Names:  []string{"ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"},
 		Titles: []string{"ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"},
 	}
-	libx265Presets = EncoderPresetSeparated{
+	Libx265Presets = EncoderPresetSeparated{
 		Names:  []string{"ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"},
 		Titles: []string{"ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"},
 	}
@@ -348,39 +348,66 @@ var (
 		Names:  []string{},
 		Titles: []string{},
 	}
-	nvenc264Presets = EncoderPresetSeparated{
+	Nvenc264Presets = EncoderPresetSeparated{
 		Names:  []string{"p1", "p2", "p3", "p4", "p5", "p6", "p7"},
 		Titles: []string{"fastest", "faster", "fast", "medium", "slow", "slower", "slowest"},
 	}
-	nvencHevcPresets = EncoderPresetSeparated{
+	NvencHevcPresets = EncoderPresetSeparated{
 		Names:  []string{"p1", "p2", "p3", "p4", "p5", "p6", "p7"},
 		Titles: []string{"fastest", "faster", "fast", "medium", "slow", "slower", "slowest"},
 	}
-	intelh264Presets = EncoderPresetSeparated{
+	IntelH264Presets = EncoderPresetSeparated{
 		Names:  []string{"veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"},
 		Titles: []string{"veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"},
 	}
-	intelHevcPresets = EncoderPresetSeparated{
+	IntelHevcPresets = EncoderPresetSeparated{
 		Names:  []string{"veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"},
 		Titles: []string{"veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"},
 	}
-	intelAv1Presets = EncoderPresetSeparated{
+	IntelAv1Presets = EncoderPresetSeparated{
 		Names:  []string{"veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"},
 		Titles: []string{"veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"},
 	}
 )
 
+func GetEncoderTypeIndex(encoderType string) int {
+	encoderTypeValues := GetEncoderTypeValues()
+	for i, encoderTypeValue := range encoderTypeValues {
+		if encoderTypeValue.Name == encoderType {
+			return i
+		}
+	}
+
+	return 0
+}
+
+func GetEncoderPresetIndex(encoderType string, encoderPresetName string) int {
+	encoderPresetsSeparated := GetEncoderPresetsSeparated()
+	encoderPresetSeparated, ok := encoderPresetsSeparated[encoderType]
+	if !ok {
+		return 0
+	}
+
+	for i, encoderPresetSeparatedName := range encoderPresetSeparated.Names {
+		if encoderPresetSeparatedName == encoderPresetName {
+			return i
+		}
+	}
+
+	return 0
+}
+
 func GetEncoderPresetsSeparated() map[string]EncoderPresetSeparated {
 	m := make(map[string]EncoderPresetSeparated)
 
-	m[Libx264EncoderName] = libx264Presets
-	m[Libx265EncoderName] = libx265Presets
+	m[Libx264EncoderName] = Libx264Presets
+	m[Libx265EncoderName] = Libx265Presets
 	m[LibaomAv1EncoderName] = LibaomAv1Presets
-	m[NvencH264EncoderName] = nvenc264Presets
-	m[NvencHevcEncoderName] = nvencHevcPresets
-	m[IntelH264EncoderName] = intelh264Presets
-	m[IntelHevcEncoderName] = intelHevcPresets
-	m[IntelAv1EncoderName] = intelAv1Presets
+	m[NvencH264EncoderName] = Nvenc264Presets
+	m[NvencHevcEncoderName] = NvencHevcPresets
+	m[IntelH264EncoderName] = IntelH264Presets
+	m[IntelHevcEncoderName] = IntelHevcPresets
+	m[IntelAv1EncoderName] = IntelAv1Presets
 
 	return m
 }

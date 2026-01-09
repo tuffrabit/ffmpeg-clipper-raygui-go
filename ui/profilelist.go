@@ -51,8 +51,10 @@ func handleProfileChange(appState *state.AppState) {
 		if err != nil {
 			appState.GlobalMessageModalState.Init("Profile Select Error", fmt.Sprintf("Failed to load config, error: %v", err), components.MESSAGE_MODAL_TYPE_ERROR)
 		}
-
 		appState.EncoderPresetsState = encoderPresetsState
+
+		profile := appState.ProfileListState.SelectedProfile()
+		appState.ProfileState.Init(profile)
 	}
 
 	previousProfileListStateActive = appState.ProfileListState.Active
@@ -60,7 +62,7 @@ func handleProfileChange(appState *state.AppState) {
 
 func handleProfileUpdateClick(clicked bool, appState *state.AppState) {
 	if clicked {
-		profile := appState.ProfileListState.EntryList[appState.ProfileListState.Active]
+		profile := appState.ProfileListState.SelectedProfile()
 		appState.GlobalConfirmModalState.Init("Update Profile?", fmt.Sprintf("Are you sure you want to update %s?", profile.ProfileName), PROFILE_LIST_UPDATE_CONFIRM_CONTEXT)
 	}
 }

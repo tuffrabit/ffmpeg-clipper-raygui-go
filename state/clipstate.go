@@ -1,10 +1,8 @@
 package state
 
 type ClipState struct {
-	Start         string
-	StartEditMode bool
-	End           string
-	EndEditMode   bool
+	Start string
+	End   string
 }
 
 func (cs *ClipState) Reset() {

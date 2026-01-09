@@ -108,56 +108,56 @@ var (
 )
 
 func handleScaleFactorInput(scaleFactor string, appState *state.AppState) {
-	err := appState.ProfileState.SetScaleFactor(scaleFactor)
+	err := appState.ProfileState.ScaleFactor.Set(scaleFactor)
 	if err != nil {
 		appState.GlobalMessageModalState.Init("Invalid Scale Down Factor", fmt.Sprintf("Failed to parse scale down factor value %s, error: %v", scaleFactor, err), components.MESSAGE_MODAL_TYPE_ERROR)
 	}
 }
 
-func handleQualityTargetInput(encoderName string, qualityTarget string, appState *state.AppState) {
-	err := appState.ProfileState.SetQualityTarget(encoderName, qualityTarget)
+func handleQualityTargetInput(qualityTarget string, appState *state.AppState) {
+	err := appState.ProfileState.QualityTarget.Set(qualityTarget)
 	if err != nil {
 		appState.GlobalMessageModalState.Init("Invalid Quality Target", fmt.Sprintf("Failed to parse quality target value %s, error: %v", qualityTarget, err), components.MESSAGE_MODAL_TYPE_ERROR)
 	}
 }
 
 func handleSaturationInput(saturation string, appState *state.AppState) {
-	err := appState.ProfileState.SetSaturation(saturation)
+	err := appState.ProfileState.Saturation.Set(saturation)
 	if err != nil {
 		appState.GlobalMessageModalState.Init("Invalid Saturation", fmt.Sprintf("Failed to parse saturation value %s, error: %v", saturation, err), components.MESSAGE_MODAL_TYPE_ERROR)
 	}
 }
 
 func handleContrastInput(contrast string, appState *state.AppState) {
-	err := appState.ProfileState.SetContrast(contrast)
+	err := appState.ProfileState.Contrast.Set(contrast)
 	if err != nil {
 		appState.GlobalMessageModalState.Init("Invalid Contrast", fmt.Sprintf("Failed to parse contrast value %s, error: %v", contrast, err), components.MESSAGE_MODAL_TYPE_ERROR)
 	}
 }
 
 func handleBrightnessInput(brightness string, appState *state.AppState) {
-	err := appState.ProfileState.SetBrightness(brightness)
+	err := appState.ProfileState.Brightness.Set(brightness)
 	if err != nil {
 		appState.GlobalMessageModalState.Init("Invalid Brightness", fmt.Sprintf("Failed to parse brightness value %s, error: %v", brightness, err), components.MESSAGE_MODAL_TYPE_ERROR)
 	}
 }
 
 func handleGammaInput(gamma string, appState *state.AppState) {
-	err := appState.ProfileState.SetGamma(gamma)
+	err := appState.ProfileState.Gamma.Set(gamma)
 	if err != nil {
 		appState.GlobalMessageModalState.Init("Invalid Gamma", fmt.Sprintf("Failed to parse gamma value %s, error: %v", gamma, err), components.MESSAGE_MODAL_TYPE_ERROR)
 	}
 }
 
 func handleExposureInput(exposure string, appState *state.AppState) {
-	err := appState.ProfileState.SetExposure(exposure)
+	err := appState.ProfileState.Exposure.Set(exposure)
 	if err != nil {
 		appState.GlobalMessageModalState.Init("Invalid Exposure", fmt.Sprintf("Failed to parse exposure value %s, error: %v", exposure, err), components.MESSAGE_MODAL_TYPE_ERROR)
 	}
 }
 
 func handleBlackLevelInput(blackLevel string, appState *state.AppState) {
-	err := appState.ProfileState.SetBlackLevel(blackLevel)
+	err := appState.ProfileState.BlackLevel.Set(blackLevel)
 	if err != nil {
 		appState.GlobalMessageModalState.Init("Invalid Black Level", fmt.Sprintf("Failed to parse black level value %s, error: %v", blackLevel, err), components.MESSAGE_MODAL_TYPE_ERROR)
 	}
@@ -182,7 +182,7 @@ func ProfileInputs(appState *state.AppState) error {
 	// profile := appState.ProfileListState.SelectedProfile()
 
 	// scaleFactor := fmt.Sprintf("%f", profile.ScaleFactor)
-	scaleFactor := appState.ProfileState.ScaleFactorInput
+	scaleFactor := appState.ProfileState.ScaleFactor.Input
 	gui.Label(profileInputsScaleDownLabelRect, "Scale Down Factor")
 	if gui.TextBox(profileInputsScaleDownInputRect, &scaleFactor, 30, scaleFactorEditMode) {
 		scaleFactorEditMode = !scaleFactorEditMode
@@ -215,7 +215,7 @@ func ProfileInputs(appState *state.AppState) error {
 	// }
 	// encoderListPreviousActiveName = encoderType
 	// appState.ProfileState.Encoder = encoderType
-	encoderTypeName := appState.ProfileState.Profile.Encoder.Name
+	encoderTypeName := appState.ProfileState.Encoder.Name
 	if encoderListPreviousActiveName != encoderTypeName {
 		encoderPresetState, err = appState.GetEncoderPresetState(encoderTypeName)
 		if err == nil {
@@ -231,18 +231,18 @@ func ProfileInputs(appState *state.AppState) error {
 		}
 	}
 	encoderListPreviousActiveName = encoderTypeName
-	//appState.ProfileState.Encoder.Name = encoderTypeName
+	appState.ProfileState.Encoder.Name = encoderTypeName
 
 	// qualityTarget := fmt.Sprintf("%d", encoderPresetState.QualityTarget)
-	qualityTarget := appState.ProfileState.GetQualityTargetInput(encoderTypeName)
+	qualityTarget := appState.ProfileState.QualityTarget.Input
 	gui.Label(profileInputsQualityTargetLabelRect, "Quality Target (0 to 51)")
 	if gui.TextBox(profileInputsQualityTargetInputRect, &qualityTarget, 30, qualityTargetEditMode) {
 		qualityTargetEditMode = !qualityTargetEditMode
 	}
-	handleQualityTargetInput(encoderTypeName, qualityTarget, appState)
+	handleQualityTargetInput(qualityTarget, appState)
 
 	// saturation := fmt.Sprintf("%f", profile.Saturation)
-	saturation := appState.ProfileState.SaturationInput
+	saturation := appState.ProfileState.Saturation.Input
 	gui.Label(profileInputsSaturationLabelRect, "Saturation (Default 1.0)")
 	if gui.TextBox(profileInputsSaturationInputRect, &saturation, 30, saturationEditMode) {
 		saturationEditMode = !saturationEditMode
@@ -250,7 +250,7 @@ func ProfileInputs(appState *state.AppState) error {
 	handleSaturationInput(saturation, appState)
 
 	//contrast := fmt.Sprintf("%f", profile.Contrast)
-	contrast := appState.ProfileState.ContrastInput
+	contrast := appState.ProfileState.Contrast.Input
 	gui.Label(profileInputsContrastLabelRect, "Contrast (Default 1.0)")
 	if gui.TextBox(profileInputsContrastInputRect, &contrast, 30, contrastEditMode) {
 		contrastEditMode = !contrastEditMode
@@ -258,7 +258,7 @@ func ProfileInputs(appState *state.AppState) error {
 	handleContrastInput(contrast, appState)
 
 	//brightness := fmt.Sprintf("%f", profile.Brightness)
-	brightness := appState.ProfileState.BrightnessInput
+	brightness := appState.ProfileState.Brightness.Input
 	gui.Label(profileInputsBrightnessLabelRect, "Brightness (Default 0.0)")
 	if gui.TextBox(profileInputsBrightnessInputRect, &brightness, 30, brightnessEditMode) {
 		brightnessEditMode = !brightnessEditMode
@@ -266,7 +266,7 @@ func ProfileInputs(appState *state.AppState) error {
 	handleBrightnessInput(brightness, appState)
 
 	//gamma := fmt.Sprintf("%f", profile.Gamma)
-	gamma := appState.ProfileState.GammaInput
+	gamma := appState.ProfileState.Gamma.Input
 	gui.Label(profileInputsGammaLabelRect, "Gamma (Default 1.0)")
 	if gui.TextBox(profileInputsGammaInputRect, &gamma, 30, gammaEditMode) {
 		gammaEditMode = !gammaEditMode
@@ -274,7 +274,7 @@ func ProfileInputs(appState *state.AppState) error {
 	handleGammaInput(gamma, appState)
 
 	//exposure := fmt.Sprintf("%f", profile.Exposure)
-	exposure := appState.ProfileState.ExposureInput
+	exposure := appState.ProfileState.Exposure.Input
 	gui.Label(profileInputsExposureLabelRect, "Exposure (Default 0.0)")
 	if gui.TextBox(profileInputsExposureInputRect, &exposure, 30, exposureEditMode) {
 		exposureEditMode = !exposureEditMode
@@ -282,7 +282,7 @@ func ProfileInputs(appState *state.AppState) error {
 	handleExposureInput(exposure, appState)
 
 	//blackLevel := fmt.Sprintf("%f", profile.BlackLevel)
-	blackLevel := appState.ProfileState.BlackLevelInput
+	blackLevel := appState.ProfileState.BlackLevel.Input
 	gui.Label(profileInputsBlackLevelLabelRect, "Black Level (Default 0.0)")
 	if gui.TextBox(profileInputsBlackLevelInputRect, &blackLevel, 30, blackLevelEditMode) {
 		blackLevelEditMode = !blackLevelEditMode
@@ -291,36 +291,32 @@ func ProfileInputs(appState *state.AppState) error {
 
 	gui.Label(profileInputsEncoderPresetLabelRect, "Encoding Preset")
 	if encoderSettingsValid {
-		encoderPresetActive := appState.ProfileState.GetEncodingPresetActive(encoderTypeName)
+		encoderPresetActive := int32(appState.ProfileState.EncoderPreset.Value)
 		//if gui.DropdownBox(profileInputsEncoderPresetInputRect, encoderSettingsDropDownState.ListEntries, &encoderSettingsDropDownState.Active, encoderPresetListEditMode) {
 		if gui.DropdownBox(profileInputsEncoderPresetInputRect, encoderSettingsDropDownState.ListEntries, &encoderPresetActive, encoderPresetListEditMode) {
 			encoderPresetListEditMode = !encoderPresetListEditMode
 		}
 		encoderSettingsDropDownState.Active = encoderPresetActive
 		//appState.ProfileState.EncoderPreset = encoderSettingsDropDownState.Selected()
-
-		// appState.ProfileState.EncoderPreset.Name = encoderSettingsDropDownState.Selected()
-		// appState.ProfileState.EncoderPreset.Value = int(encoderPresetActive)
-		appState.ProfileState.SetEncodingPreset(encoderTypeName, encoderPresetActive)
+		appState.ProfileState.EncoderPreset.Name = encoderSettingsDropDownState.Selected()
+		appState.ProfileState.EncoderPreset.Value = int(encoderPresetActive)
 	} else {
 		//appState.ProfileState.EncoderPreset = ""
-
-		// appState.ProfileState.EncoderPreset.Name = ""
-		// appState.ProfileState.EncoderPreset.Value = 0
-
+		appState.ProfileState.EncoderPreset.Name = ""
+		appState.ProfileState.EncoderPreset.Value = 0
 		gui.SetState(gui.STATE_DISABLED)
 		gui.DropdownBox(profileInputsEncoderPresetInputRect, ";", &encoderPresetListActiveFake, false)
 		gui.SetState(gui.STATE_NORMAL)
 	}
 
-	encoderTypeActive := appState.ProfileState.EncoderActive
+	encoderTypeActive := int32(appState.ProfileState.Encoder.Value)
 	gui.Label(profileInputsEncodersLabelRect, "Encoder")
 	// if gui.DropdownBox(profileInputsEncodersInputRect, encoderListDropDownState.ListEntries, &encoderListDropDownState.Active, encoderListEditMode) {
 	if gui.DropdownBox(profileInputsEncodersInputRect, encoderListDropDownState.ListEntries, &encoderTypeActive, encoderListEditMode) {
 		encoderListEditMode = !encoderListEditMode
 	}
 	encoderListDropDownState.Active = encoderTypeActive
-	appState.ProfileState.SetEncoder(encoderTypeActive)
+	appState.ProfileState.Encoder.Value = int(encoderTypeActive)
 
 	// appState.ProfileListState.UpdateSelectedProfile(profile)
 
