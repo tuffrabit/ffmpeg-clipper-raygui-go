@@ -43,14 +43,14 @@ func main() {
 			continue
 		}
 
-		ui.PickLocalDirectory(&appState)
-		ui.VideoList(&appState)
-		ui.ProfileList(&appState)
-		ui.VideoSizeStats(&appState)
-		ui.StartStopInputs(&appState)
-		ui.ClipButtonRow(&appState)
-		ui.ProfileInputs(&appState)
-		ui.Statusbar(&appState)
+		ui.PickLocalDirectory(appState)
+		ui.VideoList(appState)
+		ui.ProfileList(appState)
+		ui.VideoSizeStats(appState)
+		ui.StartStopInputs(appState)
+		ui.ClipButtonRow(appState)
+		ui.ProfileInputs(appState)
+		ui.Statusbar(appState)
 
 		if appState.LocalDirectoryPickerState.WindowOpen {
 			var err error

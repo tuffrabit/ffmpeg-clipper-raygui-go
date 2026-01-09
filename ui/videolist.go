@@ -108,8 +108,7 @@ func handleVideoSelect(appState *state.AppState) {
 			appState.GlobalMessageModalState.Init("Video Resolution Error", fmt.Sprintf("Failed to calculate video resolution for %s, error: %v", appState.CurrentVideoState.FullPath, err), components.MESSAGE_MODAL_TYPE_ERROR)
 		}
 
-		appState.CurrentVideoState.Width = width
-		appState.CurrentVideoState.Height = height
+		appState.CurrentVideoState.Update(width, height)
 	}
 }
 
@@ -124,6 +123,28 @@ func handlePlayClick(clicked bool, appState *state.AppState) {
 func handleVideoDeleteClick(clicked bool, appState *state.AppState) {
 	if clicked {
 		appState.GlobalConfirmModalState.Init("Delete Video?", fmt.Sprintf("Are you sure you want to delete %s?", appState.CurrentVideoState.FullPath), VIDEO_LIST_DELETE_CONFIRM_CONTEXT)
+	}
+}
+
+func handleSetStartClick(clicked bool, appState *state.AppState) {
+	if !clicked {
+		return
+	}
+
+	err := appState.ClipState.SetStart(timestamp)
+	if err != nil {
+		appState.GlobalMessageModalState.Init("Invalid Start", fmt.Sprintf("Failed to parse start value %s, error: %v", timestamp, err), components.MESSAGE_MODAL_TYPE_ERROR)
+	}
+}
+
+func handleSetStopClick(clicked bool, appState *state.AppState) {
+	if !clicked {
+		return
+	}
+
+	err := appState.ClipState.SetEnd(timestamp)
+	if err != nil {
+		appState.GlobalMessageModalState.Init("Invalid End", fmt.Sprintf("Failed to parse end value %s, error: %v", timestamp, err), components.MESSAGE_MODAL_TYPE_ERROR)
 	}
 }
 
@@ -164,13 +185,15 @@ func VideoList(appState *state.AppState) error {
 	if !playing {
 		gui.SetState(gui.STATE_DISABLED)
 	}
-	gui.Button(videoListClipStartButtonRect, gui.IconText(gui.ICON_PLAYER_PREVIOUS, "Set Clip Start"))
-	gui.Button(videoListClipStopButtonRect, gui.IconText(gui.ICON_PLAYER_NEXT, "Set Clip Start"))
+	setStartButton := gui.Button(videoListClipStartButtonRect, gui.IconText(gui.ICON_PLAYER_PREVIOUS, "Set Clip Start"))
+	setStopButton := gui.Button(videoListClipStopButtonRect, gui.IconText(gui.ICON_PLAYER_NEXT, "Set Clip End"))
 	gui.SetState(gui.STATE_NORMAL)
 
 	handlePlayClick(playButton, appState)
 	handleVideoDeleteClick(deleteButton, appState)
 	handleVideoDeleteGlobalConfirm(appState)
+	handleSetStartClick(setStartButton, appState)
+	handleSetStopClick(setStopButton, appState)
 
 	return nil
 }

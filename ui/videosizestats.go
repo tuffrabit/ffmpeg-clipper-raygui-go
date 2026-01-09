@@ -30,7 +30,7 @@ func VideoSizeStats(appState *state.AppState) error {
 	}
 
 	gui.Label(videoSizeSourceRect, fmt.Sprintf("Source Resolution: %dx%d", appState.CurrentVideoState.Width, appState.CurrentVideoState.Height))
-	gui.Label(videoSizeNewSizeRect, "New Resolution:     no value yet")
+	gui.Label(videoSizeNewSizeRect, fmt.Sprintf("New Resolution:      %dx%d", appState.CurrentVideoState.NewWidth, appState.CurrentVideoState.NewHeight))
 
 	return nil
 }

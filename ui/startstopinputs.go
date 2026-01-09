@@ -1,8 +1,11 @@
 package ui
 
 import (
+	"fmt"
+
 	gui "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/components"
 	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/state"
 )
 
@@ -37,14 +40,24 @@ func StartStopInputs(appState *state.AppState) error {
 		return nil
 	}
 
-	gui.Label(startStopInputsStartLabelRect, "Start (hh:mm:ss)")
-	if gui.TextBox(startStopInputsStartInputRect, &appState.ClipState.Start, 9, startEditMode) {
+	startInput := appState.ClipState.StartInput
+	gui.Label(startStopInputsStartLabelRect, "Start (seconds decimal)")
+	if gui.TextBox(startStopInputsStartInputRect, &startInput, 9, startEditMode) {
 		startEditMode = !startEditMode
 	}
+	err := appState.ClipState.SetStart(startInput)
+	if err != nil {
+		appState.GlobalMessageModalState.Init("Invalid Start", fmt.Sprintf("Failed to parse start value %s, error: %v", startInput, err), components.MESSAGE_MODAL_TYPE_ERROR)
+	}
 
-	gui.Label(startStopInputsEndLabelRect, "End (hh:mm:ss)")
-	if gui.TextBox(startStopInputsEndInputRect, &appState.ClipState.End, 9, endEditMode) {
+	endInput := appState.ClipState.EndInput
+	gui.Label(startStopInputsEndLabelRect, "End (seconds decimal)")
+	if gui.TextBox(startStopInputsEndInputRect, &endInput, 9, endEditMode) {
 		endEditMode = !endEditMode
+	}
+	err = appState.ClipState.SetEnd(endInput)
+	if err != nil {
+		appState.GlobalMessageModalState.Init("Invalid End", fmt.Sprintf("Failed to parse end value %s, error: %v", endInput, err), components.MESSAGE_MODAL_TYPE_ERROR)
 	}
 
 	return nil

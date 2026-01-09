@@ -7,40 +7,13 @@ import (
 	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/config"
 )
 
-// type IntBackedString struct {
-// 	Name  string
-// 	Value int
-// }
-
-// func (ibs *IntBackedString) Set(name string, value int) {
-// 	ibs.Name = name
-// 	ibs.Value = value
-// }
-
-// type ProfileState struct {
-// 	ScaleFactor   Float32StringValue
-// 	Encoder       IntBackedString
-// 	EncoderPreset IntBackedString
-// 	QualityTarget IntStringValue
-// 	Saturation    Float32StringValue
-// 	Contrast      Float32StringValue
-// 	Brightness    Float32StringValue
-// 	Gamma         Float32StringValue
-// 	Exposure      Float32StringValue
-// 	BlackLevel    Float32StringValue
-// 	PlayAfter     bool
-// }
-
-// func (ps *ProfileState) Init(profile config.ClipProfileJson) {
-// 	ps.ScaleFactor.Input = fmt.Sprintf("%f", profile.ScaleFactor)
-// 	ps.ScaleFactor.Value = profile.ScaleFactor
-
-// 	ps.Encoder.Value = config.GetEncoderTypeIndex(profile.Encoder.Name)
-// 	ps.Encoder.Name = profile.Encoder.Name
-// }
+type ProfileStateUpdatable interface {
+	ScaleFactorUpdated(scaleFactor float32)
+}
 
 type ProfileState struct {
 	Profile                             config.ClipProfileJson
+	ProfileStateUpdatables              []ProfileStateUpdatable
 	ScaleFactorInput                    string
 	EncoderActive                       int32
 	SaturationInput                     string
@@ -69,6 +42,9 @@ type ProfileState struct {
 func (ps *ProfileState) Init(profile config.ClipProfileJson) {
 	ps.Profile = profile
 	ps.ScaleFactorInput = strconv.FormatFloat(float64(profile.ScaleFactor), 'f', -1, 32)
+	for _, profileStateUpdatable := range ps.ProfileStateUpdatables {
+		profileStateUpdatable.ScaleFactorUpdated(profile.ScaleFactor)
+	}
 	ps.EncoderActive = int32(config.GetEncoderTypeIndex(profile.Encoder.Name))
 	ps.SaturationInput = strconv.FormatFloat(float64(profile.Saturation), 'f', -1, 32)
 	ps.ContrastInput = strconv.FormatFloat(float64(profile.Contrast), 'f', -1, 32)
@@ -98,18 +74,21 @@ func (ps *ProfileState) SetScaleFactor(input string) error {
 		return nil
 	}
 
-	if input == "" {
-		ps.Profile.ScaleFactor = 0
-		ps.ScaleFactorInput = input
-		return nil
+	var scaleFactor float32
+	if input != "" {
+		v, err := strconv.ParseFloat(input, 32)
+		if err != nil {
+			return fmt.Errorf("state.ProfileState.SetScaleFactor: failed to convert input to float, error: %w", err)
+		}
+		scaleFactor = float32(v)
 	}
 
-	v, err := strconv.ParseFloat(input, 32)
-	if err != nil {
-		return fmt.Errorf("state.ProfileState.SetScaleFactor: failed to convert input to float, error: %w", err)
-	}
-	ps.Profile.ScaleFactor = float32(v)
+	ps.Profile.ScaleFactor = scaleFactor
 	ps.ScaleFactorInput = input
+
+	for _, profileStateUpdatable := range ps.ProfileStateUpdatables {
+		profileStateUpdatable.ScaleFactorUpdated(scaleFactor)
+	}
 
 	return nil
 }

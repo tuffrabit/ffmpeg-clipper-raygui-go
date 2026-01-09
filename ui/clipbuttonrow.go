@@ -32,7 +32,7 @@ func ClipButtonRow(appState *state.AppState) error {
 	}
 
 	profile := appState.ProfileListState.SelectedProfile()
-	profile.PlayAfter = gui.CheckBox(clipButtonRowPlayCheckRect, "Auto Play New Clip", profile.PlayAfter)
+	appState.ProfileState.Profile.PlayAfter = gui.CheckBox(clipButtonRowPlayCheckRect, "Auto Play New Clip", appState.ProfileState.Profile.PlayAfter)
 	appState.ProfileListState.UpdateSelectedProfile(profile)
 	gui.Button(clipButtonRowClipButtonRect, gui.IconText(gui.ICON_FILE_CUT, "Clip"))
 

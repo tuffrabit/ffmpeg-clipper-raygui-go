@@ -21,9 +21,12 @@ type AppState struct {
 	EncoderPresetsState       map[string]EncoderPresetState
 }
 
-func CreateAppState() AppState {
+func CreateAppState() *AppState {
 	appState := AppState{}
-	return appState
+
+	appState.ProfileState.ProfileStateUpdatables = append(appState.ProfileState.ProfileStateUpdatables, &appState.CurrentVideoState)
+
+	return &appState
 }
 
 func (as *AppState) GetEncoderPresetState(encoderTypeName string) (EncoderPresetState, error) {
