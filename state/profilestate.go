@@ -98,6 +98,12 @@ func (ps *ProfileState) SetScaleFactor(input string) error {
 		return nil
 	}
 
+	if input == "" {
+		ps.Profile.ScaleFactor = 0
+		ps.ScaleFactorInput = input
+		return nil
+	}
+
 	v, err := strconv.ParseFloat(input, 32)
 	if err != nil {
 		return fmt.Errorf("state.ProfileState.SetScaleFactor: failed to convert input to float, error: %w", err)
@@ -128,6 +134,12 @@ func (ps *ProfileState) SetSaturation(input string) error {
 		return nil
 	}
 
+	if input == "" {
+		ps.Profile.Saturation = 0
+		ps.SaturationInput = input
+		return nil
+	}
+
 	v, err := strconv.ParseFloat(input, 32)
 	if err != nil {
 		return fmt.Errorf("state.ProfileState.SetSaturation: failed to convert input to float, error: %w", err)
@@ -140,6 +152,12 @@ func (ps *ProfileState) SetSaturation(input string) error {
 
 func (ps *ProfileState) SetContrast(input string) error {
 	if input == ps.ContrastInput {
+		return nil
+	}
+
+	if input == "" {
+		ps.Profile.Contrast = 0
+		ps.ContrastInput = input
 		return nil
 	}
 
@@ -158,6 +176,12 @@ func (ps *ProfileState) SetBrightness(input string) error {
 		return nil
 	}
 
+	if input == "" {
+		ps.Profile.Brightness = 0
+		ps.BrightnessInput = input
+		return nil
+	}
+
 	v, err := strconv.ParseFloat(input, 32)
 	if err != nil {
 		return fmt.Errorf("state.ProfileState.SetBrightness: failed to convert input to float, error: %w", err)
@@ -170,6 +194,12 @@ func (ps *ProfileState) SetBrightness(input string) error {
 
 func (ps *ProfileState) SetGamma(input string) error {
 	if input == ps.GammaInput {
+		return nil
+	}
+
+	if input == "" {
+		ps.Profile.Gamma = 0
+		ps.GammaInput = input
 		return nil
 	}
 
@@ -188,6 +218,12 @@ func (ps *ProfileState) SetExposure(input string) error {
 		return nil
 	}
 
+	if input == "" {
+		ps.Profile.Exposure = 0
+		ps.ExposureInput = input
+		return nil
+	}
+
 	v, err := strconv.ParseFloat(input, 32)
 	if err != nil {
 		return fmt.Errorf("state.ProfileState.SetExposure: failed to convert input to float, error: %w", err)
@@ -200,6 +236,12 @@ func (ps *ProfileState) SetExposure(input string) error {
 
 func (ps *ProfileState) SetBlackLevel(input string) error {
 	if input == ps.BlackLevelInput {
+		return nil
+	}
+
+	if input == "" {
+		ps.Profile.BlackLevel = 0
+		ps.BlackLevelInput = input
 		return nil
 	}
 
@@ -233,6 +275,12 @@ func (ps *ProfileState) SetLibx264QualityTarget(input string) error {
 		return nil
 	}
 
+	if input == "" {
+		ps.Profile.EncoderSettings.Libx264.QualityTarget = 0
+		ps.Libx264EncodingQualityTargetInput = input
+		return nil
+	}
+
 	v, err := strconv.Atoi(input)
 	if err != nil {
 		return fmt.Errorf("state.ProfileState.SetLibx264QualityTarget: failed to convert input to int, error: %w", err)
@@ -263,6 +311,12 @@ func (ps *ProfileState) SetLibx265QualityTarget(input string) error {
 		return nil
 	}
 
+	if input == "" {
+		ps.Profile.EncoderSettings.Libx265.QualityTarget = 0
+		ps.Libx265EncodingQualityTargetInput = input
+		return nil
+	}
+
 	v, err := strconv.Atoi(input)
 	if err != nil {
 		return fmt.Errorf("state.ProfileState.SetLibx265QualityTarget: failed to convert input to int, error: %w", err)
@@ -275,6 +329,12 @@ func (ps *ProfileState) SetLibx265QualityTarget(input string) error {
 
 func (ps *ProfileState) SetLibaomAv1QualityTarget(input string) error {
 	if input == ps.LibaomAv1EncodingQualityTargetInput {
+		return nil
+	}
+
+	if input == "" {
+		ps.Profile.EncoderSettings.LibaomAv1.QualityTarget = 0
+		ps.LibaomAv1EncodingQualityTargetInput = input
 		return nil
 	}
 
@@ -308,6 +368,12 @@ func (ps *ProfileState) SetNvencH264QualityTarget(input string) error {
 		return nil
 	}
 
+	if input == "" {
+		ps.Profile.EncoderSettings.NvencH264.QualityTarget = 0
+		ps.NvencH264EncodingQualityTargetInput = input
+		return nil
+	}
+
 	v, err := strconv.Atoi(input)
 	if err != nil {
 		return fmt.Errorf("state.ProfileState.SetNvencH264QualityTarget: failed to convert input to int, error: %w", err)
@@ -335,6 +401,12 @@ func (ps *ProfileState) SetNvencHevcEncodingPreset(active int32) {
 
 func (ps *ProfileState) SetNvencHevcQualityTarget(input string) error {
 	if input == ps.NvencHevcEncodingQualityTargetInput {
+		return nil
+	}
+
+	if input == "" {
+		ps.Profile.EncoderSettings.NvencHevc.QualityTarget = 0
+		ps.NvencHevcEncodingQualityTargetInput = input
 		return nil
 	}
 
@@ -368,6 +440,12 @@ func (ps *ProfileState) SetIntelH264QualityTarget(input string) error {
 		return nil
 	}
 
+	if input == "" {
+		ps.Profile.EncoderSettings.IntelH264.QualityTarget = 0
+		ps.IntelH264EncodingQualityTargetInput = input
+		return nil
+	}
+
 	v, err := strconv.Atoi(input)
 	if err != nil {
 		return fmt.Errorf("state.ProfileState.SetIntelH264QualityTarget: failed to convert input to int, error: %w", err)
@@ -398,6 +476,12 @@ func (ps *ProfileState) SetIntelHevcQualityTarget(input string) error {
 		return nil
 	}
 
+	if input == "" {
+		ps.Profile.EncoderSettings.IntelHevc.QualityTarget = 0
+		ps.IntelHevcEncodingQualityTargetInput = input
+		return nil
+	}
+
 	v, err := strconv.Atoi(input)
 	if err != nil {
 		return fmt.Errorf("state.ProfileState.SetIntelHevcQualityTarget: failed to convert input to int, error: %w", err)
@@ -425,6 +509,12 @@ func (ps *ProfileState) SetIntelAv1EncodingPreset(active int32) {
 
 func (ps *ProfileState) SetIntelAv1QualityTarget(input string) error {
 	if input == ps.IntelAv1EncodingQualityTargetInput {
+		return nil
+	}
+
+	if input == "" {
+		ps.Profile.EncoderSettings.IntelAv1.QualityTarget = 0
+		ps.IntelAv1EncodingQualityTargetInput = input
 		return nil
 	}
 

@@ -179,9 +179,7 @@ func ProfileInputs(appState *state.AppState) error {
 	}
 
 	var err error
-	// profile := appState.ProfileListState.SelectedProfile()
 
-	// scaleFactor := fmt.Sprintf("%f", profile.ScaleFactor)
 	scaleFactor := appState.ProfileState.ScaleFactorInput
 	gui.Label(profileInputsScaleDownLabelRect, "Scale Down Factor")
 	if gui.TextBox(profileInputsScaleDownInputRect, &scaleFactor, 30, scaleFactorEditMode) {
@@ -198,23 +196,6 @@ func ProfileInputs(appState *state.AppState) error {
 		}
 	}
 
-	// encoderType := encoderListDropDownState.Selected().Name
-	// if encoderListPreviousActiveName != encoderType {
-	// 	encoderPresetState, err = appState.GetEncoderPresetState(encoderType)
-	// 	if err == nil {
-	// 		encoderSettingsDropDownState, err = state.CreateDropDownState(encoderPresetState.EncoderPresetSeparated.Titles, encoderPresetState.EncoderPresetSeparated.Names)
-	// 		if err != nil {
-	// 			encoderSettingsValid = false
-	// 		} else {
-	// 			encoderSettingsDropDownState.Active = encoderSettingIndex(encoderPresetState.SelectedPreset, encoderPresetState.EncoderPresetSeparated.Names)
-	// 			encoderSettingsValid = true
-	// 		}
-	// 	} else {
-	// 		encoderSettingsValid = false
-	// 	}
-	// }
-	// encoderListPreviousActiveName = encoderType
-	// appState.ProfileState.Encoder = encoderType
 	encoderTypeName := appState.ProfileState.Profile.Encoder.Name
 	if encoderListPreviousActiveName != encoderTypeName {
 		encoderPresetState, err = appState.GetEncoderPresetState(encoderTypeName)
@@ -231,9 +212,7 @@ func ProfileInputs(appState *state.AppState) error {
 		}
 	}
 	encoderListPreviousActiveName = encoderTypeName
-	//appState.ProfileState.Encoder.Name = encoderTypeName
 
-	// qualityTarget := fmt.Sprintf("%d", encoderPresetState.QualityTarget)
 	qualityTarget := appState.ProfileState.GetQualityTargetInput(encoderTypeName)
 	gui.Label(profileInputsQualityTargetLabelRect, "Quality Target (0 to 51)")
 	if gui.TextBox(profileInputsQualityTargetInputRect, &qualityTarget, 30, qualityTargetEditMode) {
@@ -241,7 +220,6 @@ func ProfileInputs(appState *state.AppState) error {
 	}
 	handleQualityTargetInput(encoderTypeName, qualityTarget, appState)
 
-	// saturation := fmt.Sprintf("%f", profile.Saturation)
 	saturation := appState.ProfileState.SaturationInput
 	gui.Label(profileInputsSaturationLabelRect, "Saturation (Default 1.0)")
 	if gui.TextBox(profileInputsSaturationInputRect, &saturation, 30, saturationEditMode) {
@@ -249,7 +227,6 @@ func ProfileInputs(appState *state.AppState) error {
 	}
 	handleSaturationInput(saturation, appState)
 
-	//contrast := fmt.Sprintf("%f", profile.Contrast)
 	contrast := appState.ProfileState.ContrastInput
 	gui.Label(profileInputsContrastLabelRect, "Contrast (Default 1.0)")
 	if gui.TextBox(profileInputsContrastInputRect, &contrast, 30, contrastEditMode) {
@@ -257,7 +234,6 @@ func ProfileInputs(appState *state.AppState) error {
 	}
 	handleContrastInput(contrast, appState)
 
-	//brightness := fmt.Sprintf("%f", profile.Brightness)
 	brightness := appState.ProfileState.BrightnessInput
 	gui.Label(profileInputsBrightnessLabelRect, "Brightness (Default 0.0)")
 	if gui.TextBox(profileInputsBrightnessInputRect, &brightness, 30, brightnessEditMode) {
@@ -265,7 +241,6 @@ func ProfileInputs(appState *state.AppState) error {
 	}
 	handleBrightnessInput(brightness, appState)
 
-	//gamma := fmt.Sprintf("%f", profile.Gamma)
 	gamma := appState.ProfileState.GammaInput
 	gui.Label(profileInputsGammaLabelRect, "Gamma (Default 1.0)")
 	if gui.TextBox(profileInputsGammaInputRect, &gamma, 30, gammaEditMode) {
@@ -273,7 +248,6 @@ func ProfileInputs(appState *state.AppState) error {
 	}
 	handleGammaInput(gamma, appState)
 
-	//exposure := fmt.Sprintf("%f", profile.Exposure)
 	exposure := appState.ProfileState.ExposureInput
 	gui.Label(profileInputsExposureLabelRect, "Exposure (Default 0.0)")
 	if gui.TextBox(profileInputsExposureInputRect, &exposure, 30, exposureEditMode) {
@@ -281,7 +255,6 @@ func ProfileInputs(appState *state.AppState) error {
 	}
 	handleExposureInput(exposure, appState)
 
-	//blackLevel := fmt.Sprintf("%f", profile.BlackLevel)
 	blackLevel := appState.ProfileState.BlackLevelInput
 	gui.Label(profileInputsBlackLevelLabelRect, "Black Level (Default 0.0)")
 	if gui.TextBox(profileInputsBlackLevelInputRect, &blackLevel, 30, blackLevelEditMode) {
@@ -292,22 +265,12 @@ func ProfileInputs(appState *state.AppState) error {
 	gui.Label(profileInputsEncoderPresetLabelRect, "Encoding Preset")
 	if encoderSettingsValid {
 		encoderPresetActive := appState.ProfileState.GetEncodingPresetActive(encoderTypeName)
-		//if gui.DropdownBox(profileInputsEncoderPresetInputRect, encoderSettingsDropDownState.ListEntries, &encoderSettingsDropDownState.Active, encoderPresetListEditMode) {
 		if gui.DropdownBox(profileInputsEncoderPresetInputRect, encoderSettingsDropDownState.ListEntries, &encoderPresetActive, encoderPresetListEditMode) {
 			encoderPresetListEditMode = !encoderPresetListEditMode
 		}
 		encoderSettingsDropDownState.Active = encoderPresetActive
-		//appState.ProfileState.EncoderPreset = encoderSettingsDropDownState.Selected()
-
-		// appState.ProfileState.EncoderPreset.Name = encoderSettingsDropDownState.Selected()
-		// appState.ProfileState.EncoderPreset.Value = int(encoderPresetActive)
 		appState.ProfileState.SetEncodingPreset(encoderTypeName, encoderPresetActive)
 	} else {
-		//appState.ProfileState.EncoderPreset = ""
-
-		// appState.ProfileState.EncoderPreset.Name = ""
-		// appState.ProfileState.EncoderPreset.Value = 0
-
 		gui.SetState(gui.STATE_DISABLED)
 		gui.DropdownBox(profileInputsEncoderPresetInputRect, ";", &encoderPresetListActiveFake, false)
 		gui.SetState(gui.STATE_NORMAL)
@@ -315,14 +278,13 @@ func ProfileInputs(appState *state.AppState) error {
 
 	encoderTypeActive := appState.ProfileState.EncoderActive
 	gui.Label(profileInputsEncodersLabelRect, "Encoder")
-	// if gui.DropdownBox(profileInputsEncodersInputRect, encoderListDropDownState.ListEntries, &encoderListDropDownState.Active, encoderListEditMode) {
 	if gui.DropdownBox(profileInputsEncodersInputRect, encoderListDropDownState.ListEntries, &encoderTypeActive, encoderListEditMode) {
 		encoderListEditMode = !encoderListEditMode
 	}
 	encoderListDropDownState.Active = encoderTypeActive
 	appState.ProfileState.SetEncoder(encoderTypeActive)
 
-	// appState.ProfileListState.UpdateSelectedProfile(profile)
+	appState.ProfileListState.UpdateSelectedProfile(appState.ProfileState.Profile)
 
 	return nil
 }

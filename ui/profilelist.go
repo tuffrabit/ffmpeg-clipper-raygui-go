@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/components"
+	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/config"
 	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/state"
 
 	gui "github.com/gen2brain/raylib-go/raygui"
@@ -71,11 +72,11 @@ func handleProfileUpdateGlobalConfirm(appState *state.AppState) {
 	if appState.GlobalConfirmModalState.Completed(PROFILE_LIST_UPDATE_CONFIRM_CONTEXT) {
 		if appState.GlobalConfirmModalState.Result {
 			profile := appState.ProfileListState.SelectedProfile()
-			log.Println("Updated profile:", profile.ProfileName)
-			var err error
+			err := config.SaveProfile(&profile)
 			if err != nil {
 				appState.GlobalMessageModalState.Init("Update Profile Error", fmt.Sprintf("Failed to update %s, error: %v", profile.ProfileName, err), components.MESSAGE_MODAL_TYPE_ERROR)
 			}
+			log.Println("Updated profile:", profile.ProfileName)
 			appState.ProfileListState.Reset()
 		}
 
