@@ -45,6 +45,7 @@ func main() {
 
 		ui.PickLocalDirectory(appState)
 		ui.VideoList(appState)
+		ui.FFplayHelp(appState)
 		ui.ProfileList(appState)
 		ui.VideoSizeStats(appState)
 		ui.StartStopInputs(appState)
