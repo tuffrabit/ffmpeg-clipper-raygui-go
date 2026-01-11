@@ -51,22 +51,6 @@ func CheckSystemFFmpeg() Exists {
 		return systemExists.Get()
 	}
 
-	// pathVar := os.Getenv("PATH")
-	// paths := strings.Split(pathVar, ";")
-
-	// for _, pathEntry := range paths {
-	// 	if strings.Contains(pathEntry, "ffmpeg") {
-	// 		systemPaths := Paths{
-	// 			FfmpegPath:  path.Join(pathEntry, "ffmpeg"),
-	// 			FfprobePath: path.Join(pathEntry, "ffprobe"),
-	// 			FfplayPath:  path.Join(pathEntry, "ffplay"),
-	// 		}
-
-	// 		systemExists.Set(CheckFFmpeg(systemPaths))
-	// 		return systemExists.Get()
-	// 	}
-	// }
-
 	exists := Exists{
 		FFmpegExists:  CheckSystemFFmpegCommand("ffmpeg"),
 		FFprobeExists: CheckSystemFFmpegCommand("ffprobe"),
@@ -75,13 +59,6 @@ func CheckSystemFFmpeg() Exists {
 
 	systemExists.Set(exists)
 	return systemExists.Get()
-
-	// systemExists.Set(Exists{
-	// 	FFmpegExists:  false,
-	// 	FFprobeExists: false,
-	// 	FFplayExists:  false,
-	// })
-	// return systemExists.Get()
 }
 
 func CheckLocalFFmpeg(path string) Exists {

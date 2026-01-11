@@ -3,7 +3,9 @@ package ui
 import (
 	gui "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/encoder"
 	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/state"
+	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/system"
 )
 
 const (
@@ -24,7 +26,82 @@ const (
 var (
 	clipButtonRowPlayCheckRect  rl.Rectangle = rl.Rectangle{X: CLIP_BUTTON_ROW_START_X, Y: CLIP_BUTTON_ROW_PLAY_CHECK_START_Y, Width: CHECKBOX_HEIGHT, Height: CHECKBOX_HEIGHT}
 	clipButtonRowClipButtonRect rl.Rectangle = rl.Rectangle{X: CLIP_BUTTON_ROW_CLIP_BUTTON_START_X, Y: CLIP_BUTTON_ROW_CLIP_BUTTON_START_Y, Width: CLIP_BUTTON_ROW_CLIP_BUTTON_WIDTH, Height: BUTTON_HEIGHT}
+
+	clipTimestamps chan string
+	clipStates     chan bool
+	clipping       bool
+	clipTimestamp  string
 )
+
+func populateClipState(appState *state.AppState) {
+	if clipTimestamps != nil && clipStates != nil {
+	cliptimestamploop:
+		for {
+			select {
+			case time, ok := <-clipTimestamps:
+				clipping = true
+				clipTimestamp = time
+
+				if !ok {
+					clipping = false
+					clipTimestamp = ""
+					break cliptimestamploop
+				}
+			case clipState, ok := <-clipStates:
+				if !ok {
+					clipping = false
+					clipTimestamp = ""
+					break cliptimestamploop
+				}
+
+				if !clipState {
+					appState.VideoListState.Reset()
+					clipping = false
+					clipTimestamp = ""
+					break cliptimestamploop
+				}
+			default:
+				break cliptimestamploop
+			}
+		}
+	}
+}
+
+func handleClipClick(clicked bool, appState *state.AppState) {
+	if !clicked {
+		return
+	}
+
+	startTime := appState.ClipState.StartInput
+	if startTime == "" {
+		startTime = "0"
+	}
+	endTime := appState.ClipState.EndInput
+	if endTime == "" {
+		endTime = "0"
+	}
+
+	cmd, cancel := encoder.GetClipCmd(appState.CurrentVideoState.FullPath, startTime, endTime, appState.ProfileState)
+	if cmd == nil {
+		return
+	}
+
+	clipTimestamps = make(chan string)
+	clipStates = make(chan bool)
+	go system.RunClipCmd(cmd, cancel, clipTimestamps, clipStates)
+}
+
+func clipTimeValid(appState *state.AppState) bool {
+	if appState.ClipState.EndInput == "" {
+		return false
+	}
+
+	if appState.ClipState.EndSeconds <= appState.ClipState.StartSeconds {
+		return false
+	}
+
+	return true
+}
 
 func ClipButtonRow(appState *state.AppState) error {
 	if appState.LocalDirectory == "" {
@@ -34,7 +111,21 @@ func ClipButtonRow(appState *state.AppState) error {
 	profile := appState.ProfileListState.SelectedProfile()
 	appState.ProfileState.Profile.PlayAfter = gui.CheckBox(clipButtonRowPlayCheckRect, "Auto Play New Clip", appState.ProfileState.Profile.PlayAfter)
 	appState.ProfileListState.UpdateSelectedProfile(profile)
-	gui.Button(clipButtonRowClipButtonRect, gui.IconText(gui.ICON_FILE_CUT, "Clip"))
+
+	populateClipState(appState)
+
+	clipButtonText := gui.IconText(gui.ICON_FILE_CUT, "Clip")
+	if clipping {
+		gui.SetState(gui.STATE_DISABLED)
+		clipButtonText = clipTimestamp
+	}
+	if appState.VideoListState.ListEntries == "" || !clipTimeValid(appState) {
+		gui.SetState(gui.STATE_DISABLED)
+	}
+	clipButton := gui.Button(clipButtonRowClipButtonRect, clipButtonText)
+	gui.SetState(gui.STATE_NORMAL)
+
+	handleClipClick(clipButton, appState)
 
 	return nil
 }

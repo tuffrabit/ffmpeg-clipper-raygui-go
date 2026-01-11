@@ -174,12 +174,12 @@ func VideoList(appState *state.AppState) error {
 	populatePlayState()
 	handleVideoSelect(appState)
 
-	playButtonText := "Play"
-	if playing {
+	playButtonText := gui.IconText(gui.ICON_PLAYER_PLAY, "Play")
+	if playing || appState.VideoListState.ListEntries == "" {
 		gui.SetState(gui.STATE_DISABLED)
 		playButtonText = timestamp
 	}
-	playButton := gui.Button(videoListPlayButtonRect, gui.IconText(gui.ICON_PLAYER_PLAY, playButtonText))
+	playButton := gui.Button(videoListPlayButtonRect, playButtonText)
 	deleteButton := gui.Button(videoListDeleteButtonRect, gui.IconText(gui.ICON_FILE_DELETE, "Delete"))
 	gui.SetState(gui.STATE_NORMAL)
 

@@ -13,13 +13,13 @@ import (
 	"sync"
 )
 
-func RunFFplay(videopath string, timestamps chan string, playStates chan bool) error {
-	ctx, cancel := context.WithCancel(context.Background())
+func RunClipCmd(cmd *exec.Cmd, cancel context.CancelFunc, timestamps chan string, playStates chan bool) error {
 	defer cancel()
-	cmd := exec.CommandContext(ctx, "ffplay", "-y", "680", "-loglevel", "-8", "-stats", videopath)
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		return fmt.Errorf("could not get stderr pipe: %w", err)
+		err := fmt.Errorf("system.RunClipCmd: could not get stderr pipe: %w", err)
+		fmt.Println(err)
+		return err
 	}
 
 	var wg sync.WaitGroup
@@ -28,13 +28,61 @@ func RunFFplay(videopath string, timestamps chan string, playStates chan bool) e
 	scanner := bufio.NewScanner(stderr)
 	scanner.Split(bufio.ScanWords)
 	go func() {
+		for scanner.Scan() {
+			currentScan := scanner.Text()
+
+			if strings.Contains(currentScan, "time=") {
+				timestamps <- currentScan[5:]
+			}
+		}
+		wg.Done()
+	}()
+
+	if err := cmd.Start(); err != nil {
+		err := fmt.Errorf("system.RunClipCmd: failed to start command: %w", err)
+		fmt.Println(err)
+		return err
+	}
+
+	playStates <- true
+	wg.Wait()
+	playStates <- false
+	close(playStates)
+	close(timestamps)
+
+	err = cmd.Wait()
+	if err != nil {
+		err := fmt.Errorf("system.RunClipCmd: failed to run command: %w", err)
+		fmt.Println(err)
+		return err
+	}
+
+	return nil
+}
+
+func RunFFplay(videopath string, timestamps chan string, playStates chan bool) error {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "ffplay", "-y", "680", "-loglevel", "-8", "-stats", videopath)
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		return fmt.Errorf("system.RunFFplay: could not get stderr pipe: %w", err)
+	}
+
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	scanner := bufio.NewScanner(stderr)
+	scanner.Split(bufio.ScanWords)
+
+	go func() {
 		prevScan := ""
 		capture := false
 
 		for scanner.Scan() {
 			currentScan := scanner.Text()
 
-			if prevScan == "vq=" {
+			if strings.Contains(prevScan, "vq=") {
 				if currentScan == "0KB" {
 					capture = false
 				} else {
@@ -51,15 +99,21 @@ func RunFFplay(videopath string, timestamps chan string, playStates chan bool) e
 	}()
 
 	if err = cmd.Start(); err != nil {
-		return err
+		return fmt.Errorf("system.RunFFplay: failed to run command: %w", err)
 	}
-	playStates <- true
 
+	playStates <- true
 	wg.Wait()
 	playStates <- false
 	close(playStates)
 	close(timestamps)
-	return cmd.Wait()
+
+	err = cmd.Wait()
+	if err != nil {
+		return fmt.Errorf("system.RunFFplay: failed to run command: %w", err)
+	}
+
+	return nil
 }
 
 func GetVideoResolution(videopath string) (int, int, error) {
