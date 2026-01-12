@@ -57,7 +57,7 @@ func populateClipState(appState *state.AppState) {
 				}
 
 				if !clipState {
-					appState.VideoListState.Reset()
+					appState.VideoListState.ResetWithSelection()
 					clipping = false
 					clipTimestamp = ""
 					break cliptimestamploop
@@ -70,7 +70,7 @@ func populateClipState(appState *state.AppState) {
 				}
 
 				if err != nil {
-					appState.VideoListState.Reset()
+					appState.VideoListState.ResetWithSelection()
 					clipping = false
 					clipTimestamp = ""
 					appState.GlobalMessageModalState.Init("FFmpeg Error", err.Error(), components.MESSAGE_MODAL_TYPE_ERROR)

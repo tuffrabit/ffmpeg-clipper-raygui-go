@@ -11,6 +11,7 @@ import (
 type DirEntryListState struct {
 	ScrollIndex int32
 	Active      int32
+	ActiveName  string
 	EntryList   []os.DirEntry
 	InitAttempt bool
 	ListEntries string
@@ -19,9 +20,21 @@ type DirEntryListState struct {
 func (dels *DirEntryListState) Reset() {
 	dels.ScrollIndex = 0
 	dels.Active = 0
+	dels.ActiveName = ""
 	dels.EntryList = nil
 	dels.InitAttempt = false
 	dels.ListEntries = ""
+}
+
+func (dels *DirEntryListState) ResetWithSelection() {
+	activeName := dels.ActiveName
+	dels.Reset()
+	dels.ActiveName = activeName
+}
+
+func (dels *DirEntryListState) SetActive(index int32) {
+	dels.Active = index
+	dels.ActiveName = dels.EntryList[index].Name()
 }
 
 func (dels *DirEntryListState) InitFileList(directory string, includeExtensions []string) error {
@@ -42,6 +55,8 @@ func (dels *DirEntryListState) InitFileList(directory string, includeExtensions 
 		return fmt.Errorf("failed to read directory %s: %v", directory, err)
 	}
 
+	activePreserved := false
+
 	for _, directoryEntry := range directoryEntries {
 		if directoryEntry.IsDir() || directoryEntry.Name() == "" {
 			continue
@@ -57,6 +72,15 @@ func (dels *DirEntryListState) InitFileList(directory string, includeExtensions 
 
 		dels.EntryList = append(dels.EntryList, directoryEntry)
 		dels.ListEntries = fmt.Sprintf("%s%s;", dels.ListEntries, directoryEntry.Name())
+
+		if dels.ActiveName != "" && dels.ActiveName == directoryEntry.Name() {
+			dels.Active = int32(len(dels.EntryList) - 1)
+			activePreserved = true
+		}
+	}
+
+	if !activePreserved {
+		dels.SetActive(0)
 	}
 
 	dels.ListEntries = strings.TrimSuffix(dels.ListEntries, ";")

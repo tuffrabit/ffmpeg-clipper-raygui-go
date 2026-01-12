@@ -21,15 +21,14 @@ This project sits on the shoulders of giants. Huge thanks to these projects:
 
 ## TODO
 
-- refresh video list maintaining selection (assuming no delete)
-- raygui styles
+--- raygui styles
 - more video stats (length, filesize, etc)
 - choose new video dir
 - modal box message wrapping
 - bug with modals not closing on X press
-- verify new clip when done
-- auto play new clip when done
+-- verify new clip when done
+-- auto play new clip when done
 - preserve encoding preset selection
 - app config settings (framerate, gui style)
-- ffmpeg local dir testing
+--- ffmpeg local dir testing
 - new video size helper since ffmpeg is so damn sensitive to resolution

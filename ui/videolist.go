@@ -171,7 +171,7 @@ func handleVideoDeleteGlobalConfirm(appState *state.AppState) {
 			if err != nil {
 				appState.GlobalMessageModalState.Init("Delete Video Error", fmt.Sprintf("Failed to delete %s, error: %v", appState.CurrentVideoState.FullPath, err), components.MESSAGE_MODAL_TYPE_ERROR)
 			}
-			appState.VideoListState.Reset()
+			appState.VideoListState.ResetWithSelection()
 		}
 
 		appState.GlobalConfirmModalState.Reset()
@@ -184,7 +184,8 @@ func VideoList(appState *state.AppState) error {
 	}
 
 	appState.VideoListState.InitFileList(appState.LocalDirectory, allowedExtensions)
-	appState.VideoListState.Active = gui.ListView(videoListRect, appState.VideoListState.ListEntries, &appState.VideoListState.ScrollIndex, appState.VideoListState.Active)
+	videoListStateActive := gui.ListView(videoListRect, appState.VideoListState.ListEntries, &appState.VideoListState.ScrollIndex, appState.VideoListState.Active)
+	appState.VideoListState.SetActive(videoListStateActive)
 
 	populatePlayState(appState)
 	handleVideoSelect(appState)
