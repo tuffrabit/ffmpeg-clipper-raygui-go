@@ -25,7 +25,7 @@ This project sits on the shoulders of giants. Huge thanks to these projects:
 - raygui styles
 - more video stats (length, filesize, etc)
 - choose new video dir
-- command error propagation
+- modal box message wrapping
 - bug with modals not closing on X press
 - verify new clip when done
 - auto play new clip when done

@@ -63,10 +63,11 @@ var allowedExtensions []string = []string{
 
 var timestamps chan string
 var playStates chan bool
+var playErrors chan error
 var playing bool
 var timestamp string
 
-func populatePlayState() {
+func populatePlayState(appState *state.AppState) {
 	if timestamps != nil && playStates != nil {
 	timestamploop:
 		for {
@@ -84,6 +85,19 @@ func populatePlayState() {
 				if !playState || !ok {
 					playing = false
 					timestamp = ""
+					break timestamploop
+				}
+			case err, ok := <-clipErrors:
+				if !ok {
+					clipping = false
+					clipTimestamp = ""
+					break timestamploop
+				}
+
+				if err != nil {
+					clipping = false
+					clipTimestamp = ""
+					appState.GlobalMessageModalState.Init("FFmpeg Error", err.Error(), components.MESSAGE_MODAL_TYPE_ERROR)
 					break timestamploop
 				}
 			default:
@@ -117,7 +131,8 @@ func handlePlayClick(clicked bool, appState *state.AppState) {
 	if clicked {
 		timestamps = make(chan string)
 		playStates = make(chan bool)
-		go system.RunFFplay(appState.CurrentVideoState.FullPath, timestamps, playStates)
+		playErrors = make(chan error)
+		go system.RunFFplay(appState.CurrentVideoState.FullPath, timestamps, playStates, playErrors)
 	}
 }
 
@@ -171,7 +186,7 @@ func VideoList(appState *state.AppState) error {
 	appState.VideoListState.InitFileList(appState.LocalDirectory, allowedExtensions)
 	appState.VideoListState.Active = gui.ListView(videoListRect, appState.VideoListState.ListEntries, &appState.VideoListState.ScrollIndex, appState.VideoListState.Active)
 
-	populatePlayState()
+	populatePlayState(appState)
 	handleVideoSelect(appState)
 
 	playButtonText := gui.IconText(gui.ICON_PLAYER_PLAY, "Play")

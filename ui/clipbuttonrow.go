@@ -3,6 +3,7 @@ package ui
 import (
 	gui "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/components"
 	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/encoder"
 	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/state"
 	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/system"
@@ -29,6 +30,7 @@ var (
 
 	clipTimestamps chan string
 	clipStates     chan bool
+	clipErrors     chan error
 	clipping       bool
 	clipTimestamp  string
 )
@@ -60,6 +62,20 @@ func populateClipState(appState *state.AppState) {
 					clipTimestamp = ""
 					break cliptimestamploop
 				}
+			case err, ok := <-clipErrors:
+				if !ok {
+					clipping = false
+					clipTimestamp = ""
+					break cliptimestamploop
+				}
+
+				if err != nil {
+					appState.VideoListState.Reset()
+					clipping = false
+					clipTimestamp = ""
+					appState.GlobalMessageModalState.Init("FFmpeg Error", err.Error(), components.MESSAGE_MODAL_TYPE_ERROR)
+					break cliptimestamploop
+				}
 			default:
 				break cliptimestamploop
 			}
@@ -88,7 +104,8 @@ func handleClipClick(clicked bool, appState *state.AppState) {
 
 	clipTimestamps = make(chan string)
 	clipStates = make(chan bool)
-	go system.RunClipCmd(cmd, cancel, clipTimestamps, clipStates)
+	clipErrors = make(chan error)
+	go system.RunClipCmd(cmd, cancel, clipTimestamps, clipStates, clipErrors)
 }
 
 func clipTimeValid(appState *state.AppState) bool {
