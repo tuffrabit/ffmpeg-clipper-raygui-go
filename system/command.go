@@ -168,6 +168,11 @@ func RunFFplay(videopath string, timestamps chan string, playStates chan bool, e
 	close(errorChan)
 }
 
+func Play(videopath string) {
+	cmd := exec.Command("ffplay", "-y", "680", "-loglevel", "-8", "-stats", videopath)
+	RunSystemCommand(cmd)
+}
+
 func GetVideoResolution(videopath string) (int, int, error) {
 	cmd := exec.Command(
 		"ffprobe",

@@ -10,10 +10,7 @@ import (
 	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/system"
 )
 
-func ClipLibaomAv1(video string, startTime string, endTime string, profileState state.ProfileState) (string, error) {
-	videoName := video[:len(video)-len(videoExtension)]
-	newVideoName := fmt.Sprintf("%v_clip%v%v", videoName, GetRandomString(), videoExtension)
-
+func ClipLibaomAv1(video string, newVideoName string, startTime string, endTime string, profileState state.ProfileState) (string, error) {
 	cmd := exec.Command("ffmpeg",
 		"-nostats",
 		"-hide_banner",
@@ -50,10 +47,7 @@ func ClipLibaomAv1(video string, startTime string, endTime string, profileState 
 	return newVideoName, nil
 }
 
-func InitClipLibaomAv1Cmd(video string, startTime string, endTime string, profileState state.ProfileState) (*exec.Cmd, context.CancelFunc) {
-	videoName := video[:len(video)-len(videoExtension)]
-	newVideoName := fmt.Sprintf("%v_clip%v%v", videoName, GetRandomString(), videoExtension)
-
+func InitClipLibaomAv1Cmd(video string, newVideoName string, startTime string, endTime string, profileState state.ProfileState) (*exec.Cmd, context.CancelFunc) {
 	ctx, cancel := context.WithCancel(context.Background())
 	return exec.CommandContext(ctx,
 		"ffmpeg",

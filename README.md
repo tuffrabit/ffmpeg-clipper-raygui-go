@@ -26,8 +26,6 @@ This project sits on the shoulders of giants. Huge thanks to these projects:
 - choose new video dir
 - modal box message wrapping
 - bug with modals not closing on X press
--- verify new clip when done
--- auto play new clip when done
 - preserve encoding preset selection
 - app config settings (framerate, gui style)
 --- ffmpeg local dir testing

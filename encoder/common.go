@@ -12,27 +12,34 @@ import (
 
 var videoExtension string = ".mp4"
 
-func GetClipCmd(video string, startTime string, endTime string, profileState state.ProfileState) (*exec.Cmd, context.CancelFunc) {
+func GetClipCmd(video string, startTime string, endTime string, profileState state.ProfileState) (string, *exec.Cmd, context.CancelFunc) {
+	videoName := video[:len(video)-len(videoExtension)]
+	newVideoName := fmt.Sprintf("%v_clip%v%v", videoName, GetRandomString(), videoExtension)
+	var cmd *exec.Cmd
+	var cancel context.CancelFunc
+
 	switch profileState.Profile.Encoder.Name {
 	case config.Libx264EncoderName:
-		return InitClipLibx264Cmd(video, startTime, endTime, profileState)
+		cmd, cancel = InitClipLibx264Cmd(video, newVideoName, startTime, endTime, profileState)
 	case config.Libx265EncoderName:
-		return InitClipLibx265Cmd(video, startTime, endTime, profileState)
+		cmd, cancel = InitClipLibx265Cmd(video, newVideoName, startTime, endTime, profileState)
 	case config.LibaomAv1EncoderName:
-		return InitClipLibaomAv1Cmd(video, startTime, endTime, profileState)
+		cmd, cancel = InitClipLibaomAv1Cmd(video, newVideoName, startTime, endTime, profileState)
 	case config.NvencH264EncoderName:
-		return InitClipNvencH264Cmd(video, startTime, endTime, profileState)
+		cmd, cancel = InitClipNvencH264Cmd(video, newVideoName, startTime, endTime, profileState)
 	case config.NvencHevcEncoderName:
-		return InitClipNvencHevcCmd(video, startTime, endTime, profileState)
+		cmd, cancel = InitClipNvencHevcCmd(video, newVideoName, startTime, endTime, profileState)
 	case config.IntelH264EncoderName:
-		return InitClipIntelH264Cmd(video, startTime, endTime, profileState)
+		cmd, cancel = InitClipIntelH264Cmd(video, newVideoName, startTime, endTime, profileState)
 	case config.IntelHevcEncoderName:
-		return InitClipIntelHevcCmd(video, startTime, endTime, profileState)
+		cmd, cancel = InitClipIntelHevcCmd(video, newVideoName, startTime, endTime, profileState)
 	case config.IntelAv1EncoderName:
-		return InitClipIntelAv1Cmd(video, startTime, endTime, profileState)
+		cmd, cancel = InitClipIntelAv1Cmd(video, newVideoName, startTime, endTime, profileState)
+	default:
+		return "", nil, nil
 	}
 
-	return nil, nil
+	return newVideoName, cmd, cancel
 }
 
 func GetRandomString() string {

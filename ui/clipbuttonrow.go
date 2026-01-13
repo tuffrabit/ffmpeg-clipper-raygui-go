@@ -1,6 +1,10 @@
 package ui
 
 import (
+	"context"
+	"fmt"
+	"os/exec"
+
 	gui "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/components"
@@ -33,6 +37,7 @@ var (
 	clipErrors     chan error
 	clipping       bool
 	clipTimestamp  string
+	newVideoName   string
 )
 
 func populateClipState(appState *state.AppState) {
@@ -57,9 +62,9 @@ func populateClipState(appState *state.AppState) {
 				}
 
 				if !clipState {
-					appState.VideoListState.ResetWithSelection()
 					clipping = false
 					clipTimestamp = ""
+					handleClipComplete(appState)
 					break cliptimestamploop
 				}
 			case err, ok := <-clipErrors:
@@ -97,7 +102,9 @@ func handleClipClick(clicked bool, appState *state.AppState) {
 		endTime = "0"
 	}
 
-	cmd, cancel := encoder.GetClipCmd(appState.CurrentVideoState.FullPath, startTime, endTime, appState.ProfileState)
+	var cmd *exec.Cmd
+	var cancel context.CancelFunc
+	newVideoName, cmd, cancel = encoder.GetClipCmd(appState.CurrentVideoState.FullPath, startTime, endTime, appState.ProfileState)
 	if cmd == nil {
 		return
 	}
@@ -106,6 +113,19 @@ func handleClipClick(clicked bool, appState *state.AppState) {
 	clipStates = make(chan bool)
 	clipErrors = make(chan error)
 	go system.RunClipCmd(cmd, cancel, clipTimestamps, clipStates, clipErrors)
+}
+
+func handleClipComplete(appState *state.AppState) {
+	appState.VideoListState.ResetWithSelection()
+	_, _, err := system.GetVideoResolution(newVideoName)
+	if err != nil {
+		appState.GlobalMessageModalState.Init("Clip Error", fmt.Sprintf("New clip %s is bad, error: %v", newVideoName, err), components.MESSAGE_MODAL_TYPE_ERROR)
+		return
+	}
+
+	if appState.ProfileState.Profile.PlayAfter {
+		go system.Play(newVideoName)
+	}
 }
 
 func clipTimeValid(appState *state.AppState) bool {

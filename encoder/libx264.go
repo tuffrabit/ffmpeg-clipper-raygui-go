@@ -58,10 +58,7 @@ func ClipLibx264(video string, startTime string, endTime string, profileState st
 	return newVideoName, nil
 }
 
-func InitClipLibx264Cmd(video string, startTime string, endTime string, profileState state.ProfileState) (*exec.Cmd, context.CancelFunc) {
-	videoName := video[:len(video)-len(videoExtension)]
-	newVideoName := fmt.Sprintf("%v_clip%v%v", videoName, GetRandomString(), videoExtension)
-
+func InitClipLibx264Cmd(video string, newVideoName string, startTime string, endTime string, profileState state.ProfileState) (*exec.Cmd, context.CancelFunc) {
 	ctx, cancel := context.WithCancel(context.Background())
 	return exec.CommandContext(ctx,
 		"ffmpeg",
