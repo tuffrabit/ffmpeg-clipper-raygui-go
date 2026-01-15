@@ -10,8 +10,10 @@ import (
 	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/config"
 	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/ffmpeg"
 	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/state"
+	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/styles"
 	"github.com/tuffrabit/ffmpeg-clipper-raygui-go/ui"
 
+	gui "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -33,10 +35,12 @@ func main() {
 	}
 
 	rl.SetTargetFPS(30)
+	styles.LoadStyle(config.GetConfig().Style)
 
 	for !rl.WindowShouldClose() {
 		rl.BeginDrawing()
-		rl.ClearBackground(rl.RayWhite)
+		rl.ClearBackground(rl.GetColor(uint(gui.GetStyle(gui.DEFAULT, gui.BACKGROUND_COLOR))))
+		//rl.ClearBackground(rl.RayWhite)
 
 		if configLoadErr != nil {
 			rl.EndDrawing()
@@ -51,6 +55,7 @@ func main() {
 		ui.StartStopInputs(appState)
 		ui.ClipButtonRow(appState)
 		ui.ProfileInputs(appState)
+		ui.StyleButton(appState)
 		ui.Statusbar(appState)
 
 		if appState.LocalDirectoryPickerState.WindowOpen {

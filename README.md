@@ -30,13 +30,12 @@ This project sits on the shoulders of giants. Huge thanks to these projects:
 
 ## TODO
 
--- mac build
--- raygui styles
+- better builds
 - more video stats (length, filesize, etc)
 - choose new video dir
 - modal box message wrapping
 - bug with modals not closing on X press
 - preserve encoding preset selection
 - app config settings (framerate, gui style)
--- ffmpeg local dir testing
+- maybe remove ffmpeg local dir support
 - new video size helper since ffmpeg is so damn sensitive to resolution

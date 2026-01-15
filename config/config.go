@@ -15,6 +15,7 @@ const CONFIG_FILENAME = "ffmpeg-clipper-config.json"
 var configJson ConfigJson
 
 type ConfigJson struct {
+	Style        string            `json:"style"`
 	ClipProfiles []ClipProfileJson `json:"profiles"`
 }
 
@@ -613,6 +614,26 @@ func GetEncoderSettingsFromProfile(name string, encoder EncoderType) (ClipProfil
 	return profile.EncoderSettings, nil
 }
 
+func SaveStyle(name string) error {
+	configJson, err := GetConfigWithLoad()
+	if err != nil {
+		return fmt.Errorf("config.SaveStyle: could not get config: %w", err)
+	}
+
+	configJson.Style = name
+	err = writeConfigFile(configJson)
+	if err != nil {
+		return fmt.Errorf("config.SaveStyle: could not write config: %w", err)
+	}
+
+	err = LoadConfig()
+	if err != nil {
+		return fmt.Errorf("config.SaveStyle: could not load updated config: %w", err)
+	}
+
+	return nil
+}
+
 func SaveProfile(profileJson *ClipProfileJson) error {
 	configJson, err := GetConfigWithLoad()
 	if err != nil {
@@ -792,6 +813,7 @@ func generateDefaultConfigJson() ConfigJson {
 	}
 
 	return ConfigJson{
+		Style: "default",
 		ClipProfiles: []ClipProfileJson{
 			huntDayClipProfile,
 			huntNightClipProfile,
