@@ -40,7 +40,6 @@ func main() {
 	for !rl.WindowShouldClose() {
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.GetColor(uint(gui.GetStyle(gui.DEFAULT, gui.BACKGROUND_COLOR))))
-		//rl.ClearBackground(rl.RayWhite)
 
 		if configLoadErr != nil {
 			rl.EndDrawing()

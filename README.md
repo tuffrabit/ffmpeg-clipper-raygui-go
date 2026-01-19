@@ -37,5 +37,4 @@ This project sits on the shoulders of giants. Huge thanks to these projects:
 - bug with modals not closing on X press
 - preserve encoding preset selection
 - app config settings (framerate, gui style)
-- maybe remove ffmpeg local dir support
 - new video size helper since ffmpeg is so damn sensitive to resolution

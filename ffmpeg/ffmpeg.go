@@ -112,7 +112,8 @@ func TotalFFmpegHealth(path string) bool {
 		return true
 	}
 
-	return LocalFFmpegHealth(path)
+	return false
+	//return LocalFFmpegHealth(path)
 }
 
 func FFmpegHealth(exists Exists) bool {
