@@ -33,6 +33,10 @@ func (dels *DirEntryListState) ResetWithSelection() {
 }
 
 func (dels *DirEntryListState) SetActive(index int32) {
+	if len(dels.EntryList) == 0 {
+		return
+	}
+
 	dels.Active = index
 	dels.ActiveName = dels.EntryList[index].Name()
 }
